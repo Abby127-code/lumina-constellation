@@ -31,6 +31,7 @@ function App() {
   const [bootstrapped, setBootstrapped] = useState(false);
   const [activeTrack, setActiveTrack] = useState<Track>('home');
   const [aiProvider, setAiProvider] = useState<string>('');
+  const [aiFree, setAiFree] = useState<boolean>(true);
 
   // 从 URL 读取 track 参数（支持深链接）
   useEffect(() => {
@@ -43,6 +44,7 @@ function App() {
   useEffect(() => {
     fetch('/api/ai-info').then((r) => r.json()).then((data) => {
       setAiProvider(data.provider === 'deepseek' ? 'DeepSeek' : data.provider === 'openai' ? 'OpenAI' : 'GLM');
+      setAiFree(data.isFree !== false);
     }).catch(() => {});
   }, []);
 
@@ -137,7 +139,7 @@ function App() {
         {activeTrack === 'genealogy' && <GenealogyTrack />}
         {activeTrack === 'microsaas' && <MicrosaasTrack />}
         {activeTrack === 'account' && <AccountPage />}
-        <Footer aiProvider={aiProvider} />
+        <Footer aiProvider={aiProvider} aiFree={aiFree} />
       </div>
       <Toaster />
     </div>
@@ -210,15 +212,16 @@ function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (
   );
 }
 
-function Footer({ aiProvider }: { aiProvider?: string }) {
+function Footer({ aiProvider, aiFree }: { aiProvider?: string; aiFree?: boolean }) {
   return (
     <footer className="mt-12 pt-6 border-t border-gold/20 text-center">
       <div className="flex items-center justify-center gap-2 text-purple-200/60 text-xs flex-wrap">
         <Sparkles className="w-3 h-3 text-gold" />
         <span>Lumina Studio · AI 原生蓝海产品矩阵 · 7 种语言 · PWA</span>
         {aiProvider && (
-          <Badge variant="outline" className="text-[9px] border-emerald-400/40 text-emerald-300 ml-1">
+          <Badge variant="outline" className={`text-[9px] ml-1 ${aiFree ? 'border-emerald-400/40 text-emerald-300' : 'border-amber-400/40 text-amber-300'}`}>
             <Cpu className="w-2.5 h-2.5 mr-1" /> {aiProvider}
+            {aiFree && <span className="ml-1">· 免费</span>}
           </Badge>
         )}
         <Sparkles className="w-3 h-3 text-gold" />
