@@ -83,7 +83,7 @@ function App() {
         });
         const authData = await authRes.json();
         if (authData.user) {
-          const savedLocale = (localStorage.getItem('lumina-locale') as any) || authData.user.locale || 'zh';
+          const savedLocale = (localStorage.getItem('lumina-locale') as any) || authData.user.locale || 'en';
           setUser({
             userId: authData.user.id,
             email: authData.user.email,
@@ -112,7 +112,7 @@ function App() {
         });
         const data = await res.json();
         if (!cancelled && data.user) {
-          const savedLocale = (localStorage.getItem('lumina-locale') as any) || 'zh';
+          const savedLocale = (localStorage.getItem('lumina-locale') as any) || 'en';
           setUser({
             userId: data.user.id,
             name: data.user.name || undefined,

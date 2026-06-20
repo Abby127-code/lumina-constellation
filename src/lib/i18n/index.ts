@@ -335,8 +335,8 @@ const ar: Dict = {
 
 const DICTS: Record<Locale, Dict> = { zh, en, es, pt, ja, hi, ar };
 
-export function t(key: string, locale: Locale = 'zh'): string {
-  return DICTS[locale]?.[key] ?? DICTS.zh[key] ?? DICTS.en[key] ?? key;
+export function t(key: string, locale: Locale = 'en'): string {
+  return DICTS[locale]?.[key] ?? DICTS.en[key] ?? DICTS.zh[key] ?? key;
 }
 
 export function getDir(locale: Locale): 'ltr' | 'rtl' {

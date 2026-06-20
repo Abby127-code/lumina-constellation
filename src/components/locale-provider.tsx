@@ -11,13 +11,13 @@ interface LocaleContextValue {
 }
 
 const LocaleContext = createContext<LocaleContextValue>({
-  locale: 'zh',
+  locale: 'en',
   setLocale: () => {},
   t: (k) => k,
   dir: 'ltr',
 });
 
-export function LocaleProvider({ children, initialLocale = 'zh' }: { children: React.ReactNode; initialLocale?: Locale }) {
+export function LocaleProvider({ children, initialLocale = 'en' }: { children: React.ReactNode; initialLocale?: Locale }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
 
   const setLocale = useCallback((l: Locale) => {

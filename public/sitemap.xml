@@ -5,8 +5,8 @@
     <loc>/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="/" />
     <xhtml:link rel="alternate" hreflang="zh" href="/?locale=zh" />
-    <xhtml:link rel="alternate" hreflang="en" href="/?locale=en" />
     <xhtml:link rel="alternate" hreflang="es" href="/?locale=es" />
     <xhtml:link rel="alternate" hreflang="pt" href="/?locale=pt" />
     <xhtml:link rel="alternate" hreflang="ja" href="/?locale=ja" />

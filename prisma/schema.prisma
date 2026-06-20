@@ -31,7 +31,7 @@ model User {
   subStatus           String?  // active/trialing/past_due/canceled
   currentPeriodEnd    DateTime?
   // 语言偏好
-  locale       String   @default("zh") // zh/en/es/pt/ja/hi/ar
+  locale       String   @default("en") // en/zh/es/pt/ja/hi/ar (English by default)
   // 配额（按日重置）
   dailyUsageCount  Int  @default(0)
   dailyUsageDate   String? // YYYY-MM-DD
@@ -85,7 +85,7 @@ model Reading {
   input       String
   result      String
   metadata    String?
-  locale      String   @default("zh")
+  locale      String   @default("en")
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId, type, createdAt])
@@ -101,7 +101,7 @@ model Dream {
   interpretation String?
   tags        String?
   dreamDate   DateTime
-  locale      String   @default("zh")
+  locale      String   @default("en")
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId, dreamDate])
@@ -119,7 +119,7 @@ model Memorial {
   photos      String?
   biography   String?
   letterToUser String?
-  locale      String   @default("zh")
+  locale      String   @default("en")
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId])
@@ -133,7 +133,7 @@ model Genealogy {
   origins     String?
   traditions  String?
   narrative   String?
-  locale      String   @default("zh")
+  locale      String   @default("en")
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId])
@@ -151,7 +151,7 @@ model DailyReport {
   luckyColor  String?
   luckyNumber String?
   summary     String
-  locale      String   @default("zh")
+  locale      String   @default("en")
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@unique([userId, reportDate, locale])
@@ -172,7 +172,7 @@ model Storybook {
   moral       String?
   shareUrl    String?
   isFavorite  Boolean  @default(false)
-  locale      String   @default("zh")
+  locale      String   @default("en")
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId, createdAt])
@@ -190,7 +190,7 @@ model PromptItem {
   isPublic    Boolean  @default(false)
   isFavorite  Boolean  @default(false)
   usageCount  Int      @default(0)
-  locale      String   @default("zh")
+  locale      String   @default("en")
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId, category, createdAt])
@@ -210,7 +210,7 @@ model DirectoryItem {
   isFeatured  Boolean  @default(false)
   isApproved  Boolean  @default(true)
   upvotes     Int      @default(0)
-  locale      String   @default("zh")
+  locale      String   @default("en")
   createdAt   DateTime @default(now())
   user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([category, isApproved, createdAt])
@@ -245,7 +245,7 @@ model MicrosaasIdea {
   techStack   String?
   upvotes     Int      @default(0)
   isApproved  Boolean  @default(true)
-  locale      String   @default("zh")
+  locale      String   @default("en")
   createdAt   DateTime @default(now())
   user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([category, isApproved])

@@ -1,12 +1,13 @@
 {
-  "name": "Lumina Studio · 8 大蓝海赛道",
+  "name": "Lumina Studio · 8 Blue Ocean Tracks",
   "short_name": "Lumina",
-  "description": "AI 原生蓝海产品矩阵 - 灵性陪伴 · 儿童故事书 · AI 目录站 · Prompt 库",
+  "description": "AI-native blue ocean product matrix - Spiritual Companion · Kids Storybook · AI Directory · Prompt Library",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0A0F1F",
   "theme_color": "#E8B14F",
   "orientation": "portrait-primary",
+  "lang": "en",
   "categories": ["lifestyle", "productivity", "entertainment"],
   "icons": [
     {

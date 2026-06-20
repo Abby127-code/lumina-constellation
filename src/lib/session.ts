@@ -18,8 +18,8 @@ export interface UserProfile {
   gender?: string;
   plan: 'free' | 'pro' | 'premium';
   trialEndsAt?: string;
-  locale: Locale;
-  isAuthed: boolean; // true = 邮箱登录用户，false = 匿名
+  locale: Locale; // default: 'en'
+  isAuthed: boolean;
   subStatus?: string;
   currentPeriodEnd?: string;
 }

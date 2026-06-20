@@ -21,14 +21,13 @@ const cormorant = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: "Lumina Studio · 8 Blue Ocean Tracks · AI-Native Product Matrix",
-  description: "AI 原生蓝海产品矩阵 — 灵性陪伴 · 儿童故事书 · AI 目录站 · Prompt 库 · 数字纪念 · 照护者 · 家谱 · 微 SaaS. 7 languages supported. PWA installable.",
+  description: "AI-native blue ocean product matrix — Spiritual Companion · Kids Storybook · AI Directory · Prompt Library · Digital Memorial · Caregiver · Genealogy · Micro SaaS. 7 languages supported. PWA installable.",
   keywords: [
-    "AI占星", "塔罗占卜", "解梦", "命理", "玄学",
-    "AI儿童故事书", "AI目录站", "AI Prompt", "数字纪念",
-    "照护者", "家谱", "Micro SaaS",
-    "Lumina Studio", "蓝海创业", "AI products",
-    "astrology AI", "tarot AI", "dream interpretation",
-    "AI kids books", "AI directory", "AI prompts library",
+    "AI astrology", "tarot reading", "dream interpretation", "numerology", "Bazi",
+    "AI kids storybook", "AI directory", "AI prompts", "digital memorial",
+    "caregiver support", "genealogy", "Micro SaaS",
+    "Lumina Studio", "blue ocean startup", "AI products",
+    "AI占星", "塔罗占卜", "解梦", "AI儿童故事书", "AI目录站",
   ],
   authors: [{ name: "Lumina Studio" }],
   manifest: "/manifest.json",
@@ -44,23 +43,23 @@ export const metadata: Metadata = {
   applicationName: "Lumina Studio",
   formatDetection: { telephone: false },
   openGraph: {
-    title: "Lumina Studio · 8 大蓝海赛道 AI 原生产品矩阵",
-    description: "一个平台，八个蓝海。AI 灵性陪伴 · 儿童故事书 · AI 目录站 · Prompt 库 · 数字纪念 · 照护者 · 家谱 · 微 SaaS",
+    title: "Lumina Studio · 8 Blue Ocean Tracks AI-Native Product Matrix",
+    description: "One platform, eight blue oceans. AI Spiritual Companion · Kids Storybook · AI Directory · Prompt Library · Digital Memorial · Caregiver · Genealogy · Micro SaaS",
     siteName: "Lumina Studio",
     type: "website",
-    locale: "zh_CN",
-    alternateLocale: ["en_US", "es_ES", "pt_BR", "ja_JP", "hi_IN", "ar_SA"],
+    locale: "en_US",
+    alternateLocale: ["zh_CN", "es_ES", "pt_BR", "ja_JP", "hi_IN", "ar_SA"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Lumina Studio",
-    description: "AI 原生蓝海产品矩阵 · 8 大赛道 · 7 种语言 · PWA",
+    description: "AI-native blue ocean product matrix · 8 tracks · 7 languages · PWA",
   },
   alternates: {
     canonical: "/",
     languages: {
-      zh: "/",
-      en: "/?locale=en",
+      en: "/",
+      zh: "/?locale=zh",
       es: "/?locale=es",
       pt: "/?locale=pt",
       ja: "/?locale=ja",
@@ -95,7 +94,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
