@@ -1,53 +1,19 @@
 /**
  * Lumina Studio - 8 大蓝海赛道统一 AI 后端
- * 在原 Mystic AI 基础上扩展：增加 storybook / prompt / directory 三个模块
+ * 支持多 AI provider：DeepSeek / OpenAI / z-ai-web-dev-sdk
+ * 通过 src/lib/ai-client.ts 统一调度
  */
-import ZAI from 'z-ai-web-dev-sdk';
+export { callAI, getAIInfo, getAIConfig, type AIProvider, type AIConfig } from '@/lib/ai-client';
+export type { AIStreamCallback } from '@/lib/ai-client';
+import { callAI as _callAI } from '@/lib/ai-client';
 
-let _zai: Awaited<ReturnType<typeof ZAI.create>> | null = null;
-
-async function getZai() {
-  if (!_zai) {
-    _zai = await ZAI.create();
-  }
-  return _zai;
-}
-
-export type AIStreamCallback = (chunk: string, full: string) => void;
-
+// 保留 callAI 的本地引用以兼容旧代码
 export async function callAI(
   systemPrompt: string,
   userPrompt: string,
-  options: {
-    temperature?: number;
-    maxTokens?: number;
-    onChunk?: AIStreamCallback;
-  } = {}
+  options: Parameters<typeof _callAI>[2] = {}
 ): Promise<string> {
-  const zai = await getZai();
-  const { temperature = 0.8, maxTokens = 2048, onChunk } = options;
-
-  const completion = await zai.chat.completions.create({
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-    ],
-    temperature,
-    max_tokens: maxTokens,
-  });
-
-  const content = completion.choices?.[0]?.message?.content || '';
-
-  if (onChunk) {
-    const chunks = content.match(/[^。！？\n]+[。！？\n]?/g) || [content];
-    let acc = '';
-    for (const chunk of chunks) {
-      acc += chunk;
-      onChunk(chunk, acc);
-    }
-  }
-
-  return content;
+  return _callAI(systemPrompt, userPrompt, options);
 }
 
 // ──────────────────────────────────────────────────────────────

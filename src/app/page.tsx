@@ -9,12 +9,13 @@ import { UpgradeButton } from '@/components/upgrade-button';
 import { Toaster } from '@/components/ui/toaster';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Moon } from 'lucide-react';
+import { Sparkles, Moon, UserCircle, Cpu } from 'lucide-react';
 import { HomePage } from '@/components/tracks/home';
 import { MemorialTrack, CaregiverTrack, GenealogyTrack, MicrosaasTrack } from '@/components/tracks/new-tracks';
 import { MysticTrack, StorybookTrack, DirectoryTrack, PromptsTrack } from '@/components/tracks/legacy-tracks';
+import { AccountPage } from '@/components/account-page';
 
-type Track = 'home' | 'mystic' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas';
+type Track = 'home' | 'mystic' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'account';
 
 export default function Home() {
   return (
@@ -29,6 +30,21 @@ function App() {
   const { t, locale } = useLocale();
   const [bootstrapped, setBootstrapped] = useState(false);
   const [activeTrack, setActiveTrack] = useState<Track>('home');
+  const [aiProvider, setAiProvider] = useState<string>('');
+
+  // 从 URL 读取 track 参数（支持深链接）
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const trackParam = params.get('track') as Track | null;
+    if (trackParam) setActiveTrack(trackParam);
+  }, []);
+
+  // 加载 AI provider 信息
+  useEffect(() => {
+    fetch('/api/ai-info').then((r) => r.json()).then((data) => {
+      setAiProvider(data.provider === 'deepseek' ? 'DeepSeek' : data.provider === 'openai' ? 'OpenAI' : 'GLM');
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -120,7 +136,8 @@ function App() {
         {activeTrack === 'caregiver' && <CaregiverTrack />}
         {activeTrack === 'genealogy' && <GenealogyTrack />}
         {activeTrack === 'microsaas' && <MicrosaasTrack />}
-        <Footer />
+        {activeTrack === 'account' && <AccountPage />}
+        <Footer aiProvider={aiProvider} />
       </div>
       <Toaster />
     </div>
@@ -129,6 +146,7 @@ function App() {
 
 function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (t: Track) => void }) {
   const { t: tr } = useLocale();
+  const { user } = useSession();
   const navItems: { id: Track; label: string }[] = [
     { id: 'home', label: tr('nav.home') },
     { id: 'mystic', label: tr('nav.mystic') },
@@ -161,6 +179,16 @@ function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (
           <LanguageSwitcher />
           <AccountButton />
           <UpgradeButton />
+          {user?.isAuthed && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onNavigate('account')}
+              className={`text-purple-200/80 hover:text-gold hover:bg-gold/10 text-xs ${activeTrack === 'account' ? 'text-gold bg-gold/10' : ''}`}
+            >
+              <UserCircle className="w-3.5 h-3.5" />
+            </Button>
+          )}
         </div>
       </div>
       <nav className="flex flex-wrap gap-1.5 bg-white/5 border border-gold/20 p-1.5 rounded-xl overflow-x-auto">
@@ -182,12 +210,17 @@ function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (
   );
 }
 
-function Footer() {
+function Footer({ aiProvider }: { aiProvider?: string }) {
   return (
     <footer className="mt-12 pt-6 border-t border-gold/20 text-center">
-      <div className="flex items-center justify-center gap-2 text-purple-200/60 text-xs">
+      <div className="flex items-center justify-center gap-2 text-purple-200/60 text-xs flex-wrap">
         <Sparkles className="w-3 h-3 text-gold" />
         <span>Lumina Studio · AI 原生蓝海产品矩阵 · 7 种语言 · PWA</span>
+        {aiProvider && (
+          <Badge variant="outline" className="text-[9px] border-emerald-400/40 text-emerald-300 ml-1">
+            <Cpu className="w-2.5 h-2.5 mr-1" /> {aiProvider}
+          </Badge>
+        )}
         <Sparkles className="w-3 h-3 text-gold" />
       </div>
       <p className="text-purple-300/40 text-xs mt-2 max-w-md mx-auto leading-relaxed">

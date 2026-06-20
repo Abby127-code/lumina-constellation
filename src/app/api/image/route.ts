@@ -3,7 +3,9 @@
  * POST /api/image
  * Body: { prompt, style?, width?, height?, userId, source?, sourceId? }
  *
- * 使用 z-ai-web-dev-sdk 的 image generation 能力
+ * Provider 优先级：
+ * 1. z-ai-web-dev-sdk（内置，免配置）— 支持图像生成
+ * 2. DeepSeek/OpenAI 不支持图像生成，自动 fallback 到 z-ai-web-dev-sdk
  */
 import { NextRequest, NextResponse } from 'next/server';
 import ZAI from 'z-ai-web-dev-sdk';
