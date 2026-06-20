@@ -14,13 +14,14 @@ import { Badge } from '@/components/ui/badge';
 import { Sparkles, Moon, UserCircle, Cpu, Crown } from 'lucide-react';
 import { HomePage } from '@/components/tracks/home';
 import { MemorialTrack, CaregiverTrack, GenealogyTrack, MicrosaasTrack } from '@/components/tracks/new-tracks';
-import { MysticTrack, StorybookTrack, DirectoryTrack, PromptsTrack } from '@/components/tracks/legacy-tracks';
+import { StorybookTrack, DirectoryTrack, PromptsTrack } from '@/components/tracks/legacy-tracks';
+import { AstrologyTrack, TarotTrack, DreamTrack, BaziTrack, DailyEnergyTrack } from '@/components/tracks/mystic-tracks';
 import { AccountPage } from '@/components/account-page';
 import { AgentTrack } from '@/components/tracks/agent-track';
 import { TiktokTrack } from '@/components/tracks/tiktok-track';
 import { AdminDashboard } from '@/components/admin-dashboard';
 
-type Track = 'home' | 'mystic' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'agent' | 'tiktok' | 'account' | 'admin';
+type Track = 'home' | 'astrology' | 'tarot' | 'dream' | 'bazi' | 'daily' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'agent' | 'tiktok' | 'account' | 'admin';
 
 export default function Home() {
   return (
@@ -153,7 +154,11 @@ function App() {
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-1 w-full">
         <Header activeTrack={activeTrack} onNavigate={setActiveTrack} />
         {activeTrack === 'home' && <HomePage onNavigate={setActiveTrack} />}
-        {activeTrack === 'mystic' && <MysticTrack />}
+        {activeTrack === 'astrology' && <AstrologyTrack />}
+        {activeTrack === 'tarot' && <TarotTrack />}
+        {activeTrack === 'dream' && <DreamTrack />}
+        {activeTrack === 'bazi' && <BaziTrack />}
+        {activeTrack === 'daily' && <DailyEnergyTrack />}
         {activeTrack === 'storybook' && <StorybookTrack />}
         {activeTrack === 'directory' && <DirectoryTrack />}
         {activeTrack === 'prompts' && <PromptsTrack />}
@@ -176,17 +181,21 @@ function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (
   const { t: tr } = useLocale();
   const { user } = useSession();
   const navItems: { id: Track; label: string }[] = [
-    { id: 'home', label: tr('nav.home') },
-    { id: 'mystic', label: tr('nav.mystic') },
-    { id: 'storybook', label: tr('nav.storybook') },
-    { id: 'directory', label: tr('nav.directory') },
-    { id: 'prompts', label: tr('nav.prompts') },
-    { id: 'memorial', label: tr('nav.memorial') },
-    { id: 'caregiver', label: tr('nav.caregiver') },
-    { id: 'genealogy', label: tr('nav.genealogy') },
-    { id: 'microsaas', label: tr('nav.microsaas') },
-    { id: 'agent', label: 'AI Agent' },
-    { id: 'tiktok', label: 'TikTok' },
+    { id: 'home', label: '✦ Sky' },
+    { id: 'astrology', label: '✦ Vega' },
+    { id: 'tarot', label: '✦ Sirius' },
+    { id: 'dream', label: '🌙 Selene' },
+    { id: 'bazi', label: '🔮 Vesta' },
+    { id: 'daily', label: '🌅 Aurora' },
+    { id: 'storybook', label: '★ Andromeda' },
+    { id: 'directory', label: '✧ Polaris' },
+    { id: 'prompts', label: '☿ Mercury' },
+    { id: 'memorial', label: '✧ Pleiades' },
+    { id: 'caregiver', label: '★ Lyra' },
+    { id: 'genealogy', label: '✦ Cassiopeia' },
+    { id: 'microsaas', label: '✧ Orion' },
+    { id: 'agent', label: '🌠 Agent' },
+    { id: 'tiktok', label: '☄ Comet' },
   ];
   return (
     <header className="mb-6 sm:mb-10">

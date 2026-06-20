@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useLocale } from '@/components/locale-provider';
 
-type Track = 'home' | 'mystic' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'agent' | 'tiktok' | 'account';
+type Track = 'home' | 'astrology' | 'tarot' | 'dream' | 'bazi' | 'daily' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'agent' | 'tiktok' | 'account';
 
 // 8 Stars of Lumina Constellation
 // Each product maps to a real star/constellation with mystical meaning
