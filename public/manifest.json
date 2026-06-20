@@ -1,7 +1,7 @@
 {
   "name": "Lumina Constellation · Eight Stars · One Sky",
   "short_name": "Lumina ✦",
-  "description": "Eight stars guiding every dimension of your life. AI Spiritual Companion · Kids Storybook · AI Directory · Prompt Library · Digital Memorial · Caregiver · Genealogy · Micro SaaS",
+  "description": "Eight independent AI products. Each a standalone brand, each installable as an app. AI Spiritual Companion · Kids Storybook · Dream Interpretation · Digital Memorial · Genealogy · Caregiver · AI Directory · Prompt Library",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0A0F1F",
@@ -25,23 +25,43 @@
   ],
   "shortcuts": [
     {
-      "name": "✦ Vega · Spiritual",
-      "url": "/?track=mystic",
+      "name": "✦ Vega · Spiritual Companion",
+      "url": "/?product=mystic",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "★ Andromeda · Kids Books",
-      "url": "/?track=storybook",
+      "name": "★ Andromeda · Kids Storybook",
+      "url": "/?product=storybook",
+      "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
+    },
+    {
+      "name": "🌙 Selene · Dream Interpretation",
+      "url": "/?product=dream",
+      "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
+    },
+    {
+      "name": "✧ Pleiades · Digital Memorial",
+      "url": "/?product=memorial",
+      "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
+    },
+    {
+      "name": "✦ Cassiopeia · Genealogy",
+      "url": "/?product=genealogy",
+      "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
+    },
+    {
+      "name": "★ Lyra · Caregiver Support",
+      "url": "/?product=caregiver",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
       "name": "✧ Polaris · AI Directory",
-      "url": "/?track=directory",
+      "url": "/?product=directory",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "✦ Sirius · Prompt Library",
-      "url": "/?track=prompts",
+      "name": "☿ Mercury · Prompt Library",
+      "url": "/?product=prompts",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     }
   ]

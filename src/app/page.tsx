@@ -11,17 +11,17 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Toaster } from '@/components/ui/toaster';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Moon, UserCircle, Cpu, Crown } from 'lucide-react';
-import { HomePage } from '@/components/tracks/home';
-import { MemorialTrack, CaregiverTrack, GenealogyTrack, MicrosaasTrack } from '@/components/tracks/new-tracks';
-import { StorybookTrack, DirectoryTrack, PromptsTrack } from '@/components/tracks/legacy-tracks';
-import { AstrologyTrack, TarotTrack, DreamTrack, BaziTrack, DailyEnergyTrack } from '@/components/tracks/mystic-tracks';
+import { Sparkles, Moon, UserCircle, Cpu, Crown, ArrowLeft } from 'lucide-react';
+import { ConstellationHome } from '@/components/constellation-home';
+import { ProductApp } from '@/components/product-app';
 import { AccountPage } from '@/components/account-page';
-import { AgentTrack } from '@/components/tracks/agent-track';
-import { TiktokTrack } from '@/components/tracks/tiktok-track';
 import { AdminDashboard } from '@/components/admin-dashboard';
 
-type Track = 'home' | 'astrology' | 'tarot' | 'dream' | 'bazi' | 'daily' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'agent' | 'tiktok' | 'account' | 'admin';
+export type ProductId =
+  | 'mystic' | 'storybook' | 'dream' | 'memorial'
+  | 'genealogy' | 'caregiver' | 'directory' | 'prompts';
+
+type View = { type: 'constellation' } | { type: 'product'; id: ProductId } | { type: 'account' } | { type: 'admin' };
 
 export default function Home() {
   return (
@@ -33,20 +33,18 @@ export default function Home() {
 
 function App() {
   const { user, setUser } = useSession();
-  const { t, locale } = useLocale();
   const [bootstrapped, setBootstrapped] = useState(false);
-  const [activeTrack, setActiveTrack] = useState<Track>('home');
+  const [view, setView] = useState<View>({ type: 'constellation' });
   const [aiProvider, setAiProvider] = useState<string>('');
   const [aiFree, setAiFree] = useState<boolean>(true);
 
-  // 从 URL 读取 track 参数（支持深链接）
+  // URL deep-link support: ?product=mystic
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const trackParam = params.get('track') as Track | null;
-    if (trackParam) setActiveTrack(trackParam);
+    const productParam = params.get('product') as ProductId | null;
+    if (productParam) setView({ type: 'product', id: productParam });
   }, []);
 
-  // 加载 AI provider 信息
   useEffect(() => {
     fetch('/api/ai-info').then((r) => r.json()).then((data) => {
       setAiProvider(data.provider === 'deepseek' ? 'DeepSeek' : data.provider === 'openai' ? 'OpenAI' : 'GLM');
@@ -54,7 +52,7 @@ function App() {
     }).catch(() => {});
   }, []);
 
-  // 自动应用推荐码（URL ?ref=xxx）
+  // Referral auto-apply
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
@@ -64,18 +62,15 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'apply-referral', userId: user.userId, code: ref }),
       }).then((r) => r.json()).then((data) => {
-        if (data.success) {
-          // 推荐码应用成功，清理 URL
-          window.history.replaceState({}, '', window.location.pathname);
-        }
+        if (data.success) window.history.replaceState({}, '', window.location.pathname);
       }).catch(() => {});
     }
   }, [user?.userId]);
 
+  // Bootstrap user
   useEffect(() => {
     let cancelled = false;
     const init = async () => {
-      // 先尝试 cookie 登录
       try {
         const authRes = await fetch('/api/auth', {
           method: 'POST',
@@ -104,7 +99,6 @@ function App() {
         }
       } catch {}
 
-      // 匿名用户：自动创建
       try {
         const res = await fetch('/api/user', {
           method: 'POST',
@@ -148,28 +142,60 @@ function App() {
     );
   }
 
+  // ─── Product App Mode (full-screen takeover) ───
+  if (view.type === 'product') {
+    return (
+      <ProductApp
+        productId={view.id}
+        onBack={() => setView({ type: 'constellation' })}
+        aiProvider={aiProvider}
+        aiFree={aiFree}
+      />
+    );
+  }
+
+  // ─── Account Page ───
+  if (view.type === 'account') {
+    return (
+      <div className="min-h-screen bg-mystic-gradient relative overflow-hidden flex flex-col">
+        <div className="absolute inset-0 starfield opacity-30 pointer-events-none" />
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-1 w-full">
+          <TopBar onNavigateHome={() => setView({ type: 'constellation' })} onAccount={() => setView({ type: 'account' })} onAdmin={() => setView({ type: 'admin' })} activeView="account" />
+          <AccountPage />
+          <Footer aiProvider={aiProvider} aiFree={aiFree} />
+        </div>
+        <Toaster />
+      </div>
+    );
+  }
+
+  // ─── Admin Dashboard ───
+  if (view.type === 'admin') {
+    return (
+      <div className="min-h-screen bg-mystic-gradient relative overflow-hidden flex flex-col">
+        <div className="absolute inset-0 starfield opacity-30 pointer-events-none" />
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-1 w-full">
+          <TopBar onNavigateHome={() => setView({ type: 'constellation' })} onAccount={() => setView({ type: 'account' })} onAdmin={() => setView({ type: 'admin' })} activeView="admin" />
+          <AdminDashboard />
+          <Footer aiProvider={aiProvider} aiFree={aiFree} />
+        </div>
+        <Toaster />
+      </div>
+    );
+  }
+
+  // ─── Constellation Home (default) ───
   return (
     <div className="min-h-screen bg-mystic-gradient relative overflow-hidden flex flex-col">
       <div className="absolute inset-0 starfield opacity-30 pointer-events-none" />
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-1 w-full">
-        <Header activeTrack={activeTrack} onNavigate={setActiveTrack} />
-        {activeTrack === 'home' && <HomePage onNavigate={setActiveTrack} />}
-        {activeTrack === 'astrology' && <AstrologyTrack />}
-        {activeTrack === 'tarot' && <TarotTrack />}
-        {activeTrack === 'dream' && <DreamTrack />}
-        {activeTrack === 'bazi' && <BaziTrack />}
-        {activeTrack === 'daily' && <DailyEnergyTrack />}
-        {activeTrack === 'storybook' && <StorybookTrack />}
-        {activeTrack === 'directory' && <DirectoryTrack />}
-        {activeTrack === 'prompts' && <PromptsTrack />}
-        {activeTrack === 'memorial' && <MemorialTrack />}
-        {activeTrack === 'caregiver' && <CaregiverTrack />}
-        {activeTrack === 'genealogy' && <GenealogyTrack />}
-        {activeTrack === 'microsaas' && <MicrosaasTrack />}
-        {activeTrack === 'agent' && <AgentTrack />}
-        {activeTrack === 'tiktok' && <TiktokTrack />}
-        {activeTrack === 'account' && <AccountPage />}
-        {activeTrack === 'admin' && <AdminDashboard />}
+        <TopBar
+          onNavigateHome={() => setView({ type: 'constellation' })}
+          onAccount={() => setView({ type: 'account' })}
+          onAdmin={() => setView({ type: 'admin' })}
+          activeView="constellation"
+        />
+        <ConstellationHome onLaunchProduct={(id) => setView({ type: 'product', id })} />
         <Footer aiProvider={aiProvider} aiFree={aiFree} />
       </div>
       <Toaster />
@@ -177,42 +203,32 @@ function App() {
   );
 }
 
-function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (t: Track) => void }) {
-  const { t: tr } = useLocale();
+// ─── Top Bar (shared) ───
+function TopBar({
+  onNavigateHome, onAccount, onAdmin, activeView,
+}: {
+  onNavigateHome: () => void;
+  onAccount: () => void;
+  onAdmin: () => void;
+  activeView: string;
+}) {
   const { user } = useSession();
-  const navItems: { id: Track; label: string }[] = [
-    { id: 'home', label: '✦ Sky' },
-    { id: 'astrology', label: '✦ Vega' },
-    { id: 'tarot', label: '✦ Sirius' },
-    { id: 'dream', label: '🌙 Selene' },
-    { id: 'bazi', label: '🔮 Vesta' },
-    { id: 'daily', label: '🌅 Aurora' },
-    { id: 'storybook', label: '★ Andromeda' },
-    { id: 'directory', label: '✧ Polaris' },
-    { id: 'prompts', label: '☿ Mercury' },
-    { id: 'memorial', label: '✧ Pleiades' },
-    { id: 'caregiver', label: '★ Lyra' },
-    { id: 'genealogy', label: '✦ Cassiopeia' },
-    { id: 'microsaas', label: '✧ Orion' },
-    { id: 'agent', label: '🌠 Agent' },
-    { id: 'tiktok', label: '☄ Comet' },
-  ];
   return (
     <header className="mb-6 sm:mb-10">
       <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => onNavigate('home')}>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={onNavigateHome}>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-purple-600 flex items-center justify-center relative">
             <Sparkles className="w-5 h-5 text-white" />
             <span className="absolute -top-1 -right-1 text-xs text-amber-300">✦</span>
           </div>
           <div>
             <h1
-              className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300"
+              className="text-xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300"
               style={{ fontFamily: 'var(--font-cormorant), serif', letterSpacing: '0.02em' }}
             >
               Lumina Constellation
             </h1>
-            <p className="text-purple-200/60 text-xs tracking-wider">✦ Eight Stars · One Sky · 八颗星，一片天空 ✦</p>
+            <p className="text-purple-200/60 text-xs tracking-wider">✦ Eight Stars · One Sky ✦</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -225,8 +241,8 @@ function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onNavigate('account')}
-              className={`text-purple-200/80 hover:text-gold hover:bg-gold/10 text-xs ${activeTrack === 'account' ? 'text-gold bg-gold/10' : ''}`}
+              onClick={onAccount}
+              className={`text-purple-200/80 hover:text-gold hover:bg-gold/10 text-xs ${activeView === 'account' ? 'text-gold bg-gold/10' : ''}`}
             >
               <UserCircle className="w-3.5 h-3.5" />
             </Button>
@@ -235,34 +251,20 @@ function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onNavigate('admin')}
-              className={`text-purple-200/60 hover:text-amber-300 hover:bg-amber-500/10 text-xs ${activeTrack === 'admin' ? 'text-amber-300 bg-amber-500/10' : ''}`}
-              title="后台仪表盘"
+              onClick={onAdmin}
+              className={`text-purple-200/60 hover:text-amber-300 hover:bg-amber-500/10 text-xs ${activeView === 'admin' ? 'text-amber-300 bg-amber-500/10' : ''}`}
+              title="Admin Dashboard"
             >
               <Crown className="w-3.5 h-3.5" />
             </Button>
           )}
         </div>
       </div>
-      <nav className="flex flex-wrap gap-1.5 bg-white/5 border border-gold/20 p-1.5 rounded-xl overflow-x-auto">
-        {navItems.map((n) => (
-          <button
-            key={n.id}
-            onClick={() => onNavigate(n.id)}
-            className={`px-3 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all ${
-              activeTrack === n.id
-                ? 'bg-gold/20 text-gold'
-                : 'text-purple-200/70 hover:text-gold hover:bg-gold/10'
-            }`}
-          >
-            {n.label}
-          </button>
-        ))}
-      </nav>
     </header>
   );
 }
 
+// ─── Footer ───
 function Footer({ aiProvider, aiFree }: { aiProvider?: string; aiFree?: boolean }) {
   return (
     <footer className="mt-12 pt-6 border-t border-gold/20 text-center">
@@ -278,7 +280,7 @@ function Footer({ aiProvider, aiFree }: { aiProvider?: string; aiFree?: boolean 
         <span className="text-amber-300">✦</span>
       </div>
       <p className="text-purple-300/40 text-xs mt-2 max-w-md mx-auto leading-relaxed">
-        ✦ Vega · ★ Andromeda · ✧ Polaris · ✦ Sirius · ✧ Pleiades · ★ Lyra · ✦ Cassiopeia · ✧ Orion ✦
+        ✦ Vega · Andromeda · Selene · Vesta · Aurora · Polaris · Mercury · Pleiades · Lyra · Cassiopeia · Orion ✦
       </p>
     </footer>
   );

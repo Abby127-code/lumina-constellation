@@ -22,23 +22,22 @@ export const PLANS = {
     name: 'Free',
     price: 0,
     dailyLimit: 3,
-    features: ['每日 3 次 AI 生成', '基础赛道访问'],
+    features: ['3 AI generations per day per product', 'Access to all 8 products'],
     stripePriceId: null,
   },
-  pro: {
-    name: 'Pro',
-    price: 19,
+  module: {
+    name: 'Single Module',
+    price: 9,
     dailyLimit: Infinity,
-    features: ['无限 AI 生成', '全部 8 赛道', '历史记录', '无广告'],
-    // 在 Stripe Dashboard 创建产品后填入 price_id
-    stripePriceId: process.env.STRIPE_PRO_PRICE_ID || 'price_pro_monthly',
+    features: ['Unlimited access to ONE product', 'Full feature unlock', 'History & favorites', 'No ads'],
+    stripePriceId: process.env.STRIPE_MODULE_PRICE_ID || 'price_module_monthly',
   },
-  premium: {
-    name: 'Premium',
+  allaccess: {
+    name: 'All-Access',
     price: 39,
     dailyLimit: Infinity,
-    features: ['Pro 全部权益', '商业授权', 'API 访问', '优先客服', '白标定制'],
-    stripePriceId: process.env.STRIPE_PREMIUM_PRICE_ID || 'price_premium_monthly',
+    features: ['Unlimited access to ALL 8 products', 'Commercial license', 'API access', 'Priority support', 'White-label option'],
+    stripePriceId: process.env.STRIPE_ALLACCESS_PRICE_ID || 'price_allaccess_monthly',
   },
 } as const;
 
@@ -78,6 +77,8 @@ export async function POST(req: NextRequest) {
       if (!PLANS[plan] || plan === 'free') {
         return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
       }
+      // Module plan requires specifying which product
+      const { productId } = body as { productId?: string };
       const planInfo = PLANS[plan];
       const stripe = await getStripe();
 
@@ -86,7 +87,7 @@ export async function POST(req: NextRequest) {
         await db.user.update({
           where: { id: userId },
           data: {
-            plan,
+            plan: plan === 'module' ? 'pro' : plan === 'allaccess' ? 'premium' : 'free',
             subStatus: 'active',
             currentPeriodEnd: new Date(Date.now() + 30 * 86400 * 1000),
           },
@@ -94,7 +95,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           success: true,
           mock: true,
-          message: `已升级到 ${planInfo.name}（测试模式，无真实扣费）`,
+          message: `Upgraded to ${planInfo.name} (test mode, no real charge)`,
           plan,
         });
       }
@@ -186,6 +187,11 @@ export async function POST(req: NextRequest) {
       const user = await db.user.findUnique({ where: { id: userId } });
       if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+      // Map DB plan to pricing tier: free→free, pro→module, premium→allaccess
+      const planMap: Record<string, PlanId> = { free: 'free', pro: 'module', premium: 'allaccess' };
+      const tier = planMap[user.plan] || 'free';
+      const limit = PLANS[tier].dailyLimit;
+
       const today = new Date().toISOString().slice(0, 10);
       if (user.dailyUsageDate !== today) {
         await db.user.update({
@@ -194,17 +200,18 @@ export async function POST(req: NextRequest) {
         });
         return NextResponse.json({
           plan: user.plan,
+          tier,
           used: 0,
-          limit: PLANS[user.plan as PlanId].dailyLimit,
-          remaining: PLANS[user.plan as PlanId].dailyLimit === Infinity ? Infinity : PLANS[user.plan as PlanId].dailyLimit,
+          limit: limit === Infinity ? 'unlimited' : limit,
+          remaining: limit === Infinity ? 'unlimited' : limit,
         });
       }
-      const limit = PLANS[user.plan as PlanId].dailyLimit;
-      const remaining = limit === Infinity ? Infinity : Math.max(0, limit - user.dailyUsageCount);
+      const remaining = limit === Infinity ? 'unlimited' : Math.max(0, limit - user.dailyUsageCount);
       return NextResponse.json({
         plan: user.plan,
+        tier,
         used: user.dailyUsageCount,
-        limit,
+        limit: limit === Infinity ? 'unlimited' : limit,
         remaining,
       });
     }
