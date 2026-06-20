@@ -14,8 +14,10 @@ import { HomePage } from '@/components/tracks/home';
 import { MemorialTrack, CaregiverTrack, GenealogyTrack, MicrosaasTrack } from '@/components/tracks/new-tracks';
 import { MysticTrack, StorybookTrack, DirectoryTrack, PromptsTrack } from '@/components/tracks/legacy-tracks';
 import { AccountPage } from '@/components/account-page';
+import { AgentTrack } from '@/components/tracks/agent-track';
+import { TiktokTrack } from '@/components/tracks/tiktok-track';
 
-type Track = 'home' | 'mystic' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'account';
+type Track = 'home' | 'mystic' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'agent' | 'tiktok' | 'account';
 
 export default function Home() {
   return (
@@ -138,6 +140,8 @@ function App() {
         {activeTrack === 'caregiver' && <CaregiverTrack />}
         {activeTrack === 'genealogy' && <GenealogyTrack />}
         {activeTrack === 'microsaas' && <MicrosaasTrack />}
+        {activeTrack === 'agent' && <AgentTrack />}
+        {activeTrack === 'tiktok' && <TiktokTrack />}
         {activeTrack === 'account' && <AccountPage />}
         <Footer aiProvider={aiProvider} aiFree={aiFree} />
       </div>
@@ -159,6 +163,8 @@ function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (
     { id: 'caregiver', label: tr('nav.caregiver') },
     { id: 'genealogy', label: tr('nav.genealogy') },
     { id: 'microsaas', label: tr('nav.microsaas') },
+    { id: 'agent', label: 'AI Agent' },
+    { id: 'tiktok', label: 'TikTok' },
   ];
   return (
     <header className="mb-6 sm:mb-10">

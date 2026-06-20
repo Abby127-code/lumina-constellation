@@ -11,7 +11,13 @@ import { useSession } from '@/lib/session';
 import { useLocale } from '@/components/locale-provider';
 import { useToast } from '@/hooks/use-toast';
 import { Sparkles, Mail, Lock, User, LogOut, Crown, Zap, Infinity as InfIcon } from 'lucide-react';
-import { PLANS } from '@/app/api/stripe/route';
+
+// 客户端版本（避免从 server-only 的 API route 导入）
+const PLANS = {
+  free: { name: 'Free' },
+  pro: { name: 'Pro' },
+  premium: { name: 'Premium' },
+} as const;
 
 export function AccountButton() {
   const { user, setUser, logout } = useSession();

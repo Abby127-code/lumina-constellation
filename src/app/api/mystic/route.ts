@@ -227,6 +227,114 @@ ${cardsDescription}
         break;
       }
 
+      // ─── AI Agent 运营模块 ───
+      case 'seoBlog': {
+        systemPrompt = PROMPTS.seoBlog;
+        userPrompt = `请为以下主题撰写一篇 SEO 优化博客文章：
+- 主关键词：${input.keyword || 'AI 灵性陪伴'}
+- 赛道：${input.track || 'mystic'}
+- 目标受众：${input.audience || '对灵性探索感兴趣的 25-40 岁女性'}
+- 字数要求：${input.wordCount || '1500-2000 字'}
+- 语言：${input.locale || 'zh'}
+- 特别要求：${input.specialRequest || '无'}`;
+        result = await callAI(systemPrompt, userPrompt, { maxTokens: 4000, temperature: 0.7 });
+        break;
+      }
+
+      case 'socialContent': {
+        systemPrompt = PROMPTS.socialContent;
+        userPrompt = `请为以下产品/赛道批量生成社交媒体内容：
+- 产品/赛道：${input.track || 'AI 灵性陪伴'}
+- 主题：${input.theme || '今日运势'}
+- 目标受众：${input.audience || 'Gen Z 灵性爱好者'}
+- 语言：${input.locale || 'zh'}
+- 品牌调性：${input.tone || '神秘奢华 · 温暖 · 富有洞察'}
+- 特别要求：${input.notes || '无'}`;
+        result = await callAI(systemPrompt, userPrompt, { maxTokens: 4000, temperature: 0.9 });
+        break;
+      }
+
+      case 'newsletter': {
+        systemPrompt = PROMPTS.newsletter;
+        const today = new Date();
+        const moonPhase = getMoonPhase(today);
+        const lifePath = input.birthDate ? getLifePathNumber(input.birthDate) : null;
+        const sunSign = input.birthDate ? getSunSign(input.birthDate) : '未知';
+        userPrompt = `请为用户撰写今日 Newsletter：
+- 用户姓名：${input.name || 'Lumina 旅人'}
+- 太阳星座：${sunSign}
+- 生命路径数：${lifePath || '未知'}
+- 今日月相：${moonPhase.phase}（${moonPhase.meaning}）
+- 今日日期：${today.toISOString().slice(0, 10)}
+- 用户最近关注的：${input.focus || '综合运势'}`;
+        result = await callAI(systemPrompt, userPrompt, { maxTokens: 2000, temperature: 0.8 });
+        break;
+      }
+
+      case 'agentFollowup': {
+        systemPrompt = PROMPTS.agentFollowup;
+        userPrompt = `请为以下用户生成跟进建议：
+- 用户姓名：${input.name || '匿名用户'}
+- 注册天数：${input.daysSinceSignup || 7}
+- 最近活跃：${input.lastActiveDays || 1} 天前
+- 累计使用次数：${input.totalUsage || 0}
+- 付费状态：${input.plan || 'free'}
+- 上次行为：${input.lastAction || '生成占星报告'}
+- 风险信号：${input.riskSignals || '无'}`;
+        result = await callAI(systemPrompt, userPrompt, { maxTokens: 2000, temperature: 0.6 });
+        break;
+      }
+
+      case 'tiktok': {
+        systemPrompt = `你是一位 TikTok 短视频内容创作专家，擅长为灵性 / 玄学 / 自我成长赛道打造爆款短视频脚本。
+你理解 TikTok 算法：前 3 秒钩子决定生死、节奏要快、视觉描述具体、CTA 明确。
+
+输出结构：
+
+## 📹 视频脚本（共 ${input.videoCount || '5'} 条）
+
+### 脚本 1
+**主题**：xxx
+**时长**：${input.duration || '15-30s'}
+**前 3 秒钩子**：[具体台词 + 视觉描述]
+**主体**：[分镜描述，含 BGM 节奏点]
+**结尾 CTA**：[引导互动 / 关注 / 评论]
+**BGM 推荐**：[TikTok 热门 BGM 风格 + 具体 Ref]
+**Hashtag**：#xxx #xxx #xxx #xxx #xxx（5-8 个，含 1 个长尾）
+**最佳发布时间**：[基于赛道受众活跃时段]
+
+### 脚本 2 ...（同上格式，共 ${input.videoCount || '5'} 条）
+
+## 📊 爆款分析
+- 建议发布频率：每天 X 条
+- 最佳发布时段：[基于目标受众]
+- 热门话题趋势：[当前赛道在 TikTok 上的机会窗口]
+
+使用 Markdown 格式输出，脚本要具体到可以直接拍摄，避免空泛描述。`;
+        userPrompt = `请为以下 TikTok 账号生成 ${input.videoCount || '5'} 条爆款短视频脚本：
+- 赛道：${input.track || 'mystic'}
+- 细分领域：${input.niche || '占星 + 塔罗 + 灵性成长'}
+- 目标受众：${input.audienceAge || 'Gen Z 女性 18-28'}
+- 账号阶段：${input.accountStage || '新号 0 粉丝'}
+- 视频时长：${input.duration || '15-30s'}
+- 语言：${input.language || 'zh'}
+- 热门趋势关注：${input.trendFocus || '当下热门：自我探索 / 内在疗愈 / 灵性觉醒'}
+- 特殊要求：${input.specialRequest || '无'}
+
+要求：
+1. 前 3 秒钩子必须极具冲击力，让人停下手指
+2. 主体节奏要快，每 3-5 秒一个画面切换
+3. BGM 推荐要具体（含 TikTok 热门 Ref 编号或音乐风格）
+4. Hashtag 包含 1 个高热度（10 亿+）+ 2 个中等（1-10 亿）+ 2 个长尾（< 1 亿）
+5. CTA 要明确：评论 / 关注 / 收藏 / 分享任选其一
+6. 每条脚本风格要有差异，覆盖不同内容类型（科普 / 故事 / 占卜 / 测试 / 教学）`;
+        result = await callAI(systemPrompt, userPrompt, {
+          maxTokens: 4000,
+          temperature: 0.9,
+        });
+        break;
+      }
+
       default:
         return NextResponse.json({ error: 'Unknown module: ' + module }, { status: 400 });
     }

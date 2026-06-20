@@ -5,11 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Sparkles, BookOpen, LayoutGrid, MessageSquareCode, Ghost, Heart,
-  Users, Zap, ArrowRight, Rocket, TrendingUp, Trophy,
+  Users, Zap, ArrowRight, Rocket, TrendingUp, Trophy, Bot, Video,
 } from 'lucide-react';
 import { useLocale } from '@/components/locale-provider';
 
-type Track = 'home' | 'mystic' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'account';
+type Track = 'home' | 'mystic' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'agent' | 'tiktok' | 'account';
 
 const TRACKS = [
   {
@@ -169,6 +169,46 @@ const TRACKS = [
       ja: 'マイクロ SaaS の迅速孵化。',
       hi: 'माइक्रो SaaS इनक्यूबेशन।',
       ar: 'حضانة مايكرو SaaS.',
+    },
+    status: 'online',
+  },
+  {
+    id: 'agent' as const,
+    name: { zh: 'AI Agent 自动化运营', en: 'AI Agent Operations', es: 'Agent IA Operaciones', pt: 'Agent IA', ja: 'AI Agent 運営', hi: 'AI एजेंट संचालन', ar: 'وكيل AI' },
+    tagline: { zh: 'SEO 内容 · 社交批量 · Newsletter · 用户跟进', en: 'SEO · Social · Newsletter · Followup', es: 'SEO · Social · Newsletter', pt: 'SEO · Social · Newsletter', ja: 'SEO・SNS・メール', hi: 'SEO · सोशल · ईमेल', ar: 'SEO · اجتماعي · بريد' },
+    icon: <Bot className="w-6 h-6" />,
+    color: 'from-emerald-400/20 to-cyan-700/20',
+    border: 'border-emerald-400/40',
+    badge: 'top1',
+    market: '一键生成 30 天运营内容',
+    description: {
+      zh: 'AI 自动化运营中心：SEO 博客生成、社交媒体批量内容、个性化 Newsletter、用户流失预警与跟进。',
+      en: 'AI operations center: SEO blog, social content, personalized newsletter, churn prediction.',
+      es: 'Centro de operaciones IA: SEO, social, newsletter, predicción de abandono.',
+      pt: 'Centro de operações IA: SEO, social, newsletter.',
+      ja: 'AI 運営センター：SEO、SNS、メール、離脱予測。',
+      hi: 'AI संचालन केंद्र: SEO, सोशल, ईमेल, चर्न पूर्वानुमान।',
+      ar: 'مركز عمليات AI: SEO، اجتماعي، بريد، توقع المغادرة.',
+    },
+    status: 'online',
+  },
+  {
+    id: 'tiktok' as const,
+    name: { zh: 'TikTok 内容生成器', en: 'TikTok Content Generator', es: 'Generador TikTok', pt: 'Gerador TikTok', ja: 'TikTok 生成器', hi: 'TikTok जनरेटर', ar: 'مولد TikTok' },
+    tagline: { zh: '脚本 · 字幕 · BGM · Hashtag · 发布时间', en: 'Scripts · Captions · BGM · Hashtag · Timing', es: 'Guiones · BGM · Hashtag', pt: 'Roteiros · BGM · Hashtag', ja: '脚本・BGM・ハッシュタグ', hi: 'स्क्रिप्ट · BGM · हैशटैग', ar: 'سيناريو · BGM · هاشتاج' },
+    icon: <Video className="w-6 h-6" />,
+    color: 'from-rose-400/20 to-purple-700/20',
+    border: 'border-rose-400/40',
+    badge: 'highFreq',
+    market: '#tarot 50 亿+ · #astrology 200 亿+ 播放',
+    description: {
+      zh: '批量生成 TikTok 爆款短视频脚本：前 3 秒钩子、分镜描述、BGM 推荐、Hashtag 优化、发布时间预测。',
+      en: 'Batch TikTok viral scripts: 3s hooks, storyboard, BGM, hashtag, timing.',
+      es: 'Guiones virales TikTok: ganchos, storyboard, BGM, hashtag.',
+      pt: 'Roteiros virais TikTok: ganchos, storyboard, BGM, hashtag.',
+      ja: 'TikTok バズスクリプト：3秒フック、絵コンテ、BGM、ハッシュタグ。',
+      hi: 'TikTok वायरल स्क्रिप्ट: 3s हुक, स्टोरीबोर्ड, BGM, हैशटैग।',
+      ar: 'سيناريوهات TikTok: خطافات 3s، لوحة قصص، BGM، هاشتاج.',
     },
     status: 'online',
   },
