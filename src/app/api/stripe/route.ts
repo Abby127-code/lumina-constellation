@@ -21,23 +21,23 @@ export const PLANS = {
   free: {
     name: 'Free',
     price: 0,
-    dailyLimit: 10, // 10 total uses (not per day — lifetime)
-    features: ['10 total generations', 'All 7 products accessible'],
+    dailyLimit: 3, // 3 free trial uses (lifetime)
+    features: ['3 free trial generations', 'No credit card needed'],
     stripePriceId: null,
   },
-  module: {
-    name: 'Single Product',
+  monthly: {
+    name: 'Monthly',
     price: 4.99,
     dailyLimit: Infinity,
-    features: ['Unlimited in ONE product', 'Full feature unlock', 'History & favorites', 'No ads'],
-    stripePriceId: process.env.STRIPE_MODULE_PRICE_ID || 'price_module_monthly',
+    features: ['Unlimited generations', 'Full feature unlock', 'History & favorites', 'Cancel anytime'],
+    stripePriceId: process.env.STRIPE_MONTHLY_PRICE_ID || 'price_monthly',
   },
-  allaccess: {
-    name: 'All-Access',
-    price: 14.99,
+  yearly: {
+    name: 'Yearly',
+    price: 47.90, // $4.99 × 12 × 0.8 (20% off)
     dailyLimit: Infinity,
-    features: ['Unlimited ALL 7 products', 'Commercial license', 'Priority support', 'Early access'],
-    stripePriceId: process.env.STRIPE_ALLACCESS_PRICE_ID || 'price_allaccess_monthly',
+    features: ['Everything in Monthly', '20% off (save $11.98/yr)', 'Priority support', 'Early access to new features'],
+    stripePriceId: process.env.STRIPE_YEARLY_PRICE_ID || 'price_yearly',
   },
 } as const;
 
@@ -84,18 +84,19 @@ export async function POST(req: NextRequest) {
 
       // Mock 模式：直接升级
       if (!stripe) {
+        const periodDays = plan === 'yearly' ? 365 : 30;
         await db.user.update({
           where: { id: userId },
           data: {
-            plan: plan === 'module' ? 'pro' : plan === 'allaccess' ? 'premium' : 'free',
+            plan: plan === 'free' ? 'free' : 'pro', // pro = paid (monthly or yearly)
             subStatus: 'active',
-            currentPeriodEnd: new Date(Date.now() + 30 * 86400 * 1000),
+            currentPeriodEnd: new Date(Date.now() + periodDays * 86400 * 1000),
           },
         });
         return NextResponse.json({
           success: true,
           mock: true,
-          message: `Upgraded to ${planInfo.name} (test mode, no real charge)`,
+          message: `Upgraded to ${planInfo.name} ($${planInfo.price}${plan === 'yearly' ? '/yr' : '/mo'}) — test mode, no real charge`,
           plan,
         });
       }
@@ -187,9 +188,9 @@ export async function POST(req: NextRequest) {
       const user = await db.user.findUnique({ where: { id: userId } });
       if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-      // Map DB plan to pricing tier: free→free, pro→module, premium→allaccess
-      const planMap: Record<string, PlanId> = { free: 'free', pro: 'module', premium: 'allaccess' };
-      const tier = planMap[user.plan] || 'free';
+      // Map DB plan to pricing tier: free→free, pro→monthly/yearly (both unlimited)
+      const isPaid = user.plan === 'pro' || user.plan === 'premium';
+      const tier: PlanId = isPaid ? 'monthly' : 'free';
       const limit = PLANS[tier].dailyLimit;
 
       const today = new Date().toISOString().slice(0, 10);
