@@ -1,0 +1,957 @@
+     1→'use client';
+     2→
+     3→import { useEffect, useState, useCallback } from 'react';
+     4→import { useSession } from '@/lib/session';
+     5→import { Button } from '@/components/ui/button';
+     6→import { Input } from '@/components/ui/input';
+     7→import { Label } from '@/components/ui/label';
+     8→import { Textarea } from '@/components/ui/textarea';
+     9→import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+    10→import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+    11→import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+    12→import { Badge } from '@/components/ui/badge';
+    13→import { Progress } from '@/components/ui/progress';
+    14→import { ScrollArea } from '@/components/ui/scroll-area';
+    15→import { Toaster } from '@/components/ui/toaster';
+    16→import { useToast } from '@/hooks/use-toast';
+    17→import {
+    18→  Sparkles, Moon, Star, Sun, Gem, BookOpen, Heart, Users,
+    19→  Loader2, Calendar, Clock, MapPin, Send,
+    20→  TrendingUp, Brain, Palette, Hash, Crown, Ghost, Activity,
+    21→} from 'lucide-react';
+    22→import ReactMarkdown from 'react-markdown';
+    23→
+    24→type Module = 'daily' | 'astrology' | 'tarot' | 'dream' | 'bazi' | 'memorial' | 'genealogy';
+    25→
+    26→// ─────────────────────────────────────────────
+    27→// 主入口组件
+    28→// ─────────────────────────────────────────────
+    29→export default function Home() {
+    30→  const { user, setUser, updateProfile } = useSession();
+    31→  const { toast } = useToast();
+    32→  const [bootstrapped, setBootstrapped] = useState(false);
+    33→
+    34→  // 首次访问：自动创建匿名用户
+    35→  useEffect(() => {
+    36→    if (user) {
+    37→      setBootstrapped(true);
+    38→      return;
+    39→    }
+    40→    fetch('/api/user', {
+    41→      method: 'POST',
+    42→      headers: { 'Content-Type': 'application/json' },
+    43→      body: JSON.stringify({}),
+    44→    })
+    45→      .then((r) => r.json())
+    46→      .then((data) => {
+    47→        if (data.user) {
+    48→          setUser({
+    49→            userId: data.user.id,
+    50→            name: data.user.name || undefined,
+    51→            email: data.user.email || undefined,
+    52→            birthDate: data.user.birthDate || undefined,
+    53→            birthTime: data.user.birthTime || undefined,
+    54→            birthPlace: data.user.birthPlace || undefined,
+    55→            gender: data.user.gender || undefined,
+    56→            plan: data.user.plan || 'free',
+    57→            trialEndsAt: data.user.trialEndsAt || undefined,
+    58→          });
+    59→        }
+    60→      })
+    61→      .catch((e) => console.error('user init error:', e))
+    62→      .finally(() => setBootstrapped(true));
+    63→  }, [user, setUser]);
+    64→
+    65→  if (!bootstrapped) {
+    66→    return (
+    67→      <div className="min-h-screen bg-mystic-gradient flex items-center justify-center">
+    68→        <div className="text-center">
+    69→          <Moon className="w-12 h-12 text-gold mx-auto animate-float" />
+    70→          <p className="text-gold mt-4 text-sm tracking-widest">CONNECTING TO COSMOS...</p>
+    71→        </div>
+    72→      </div>
+    73→    );
+    74→  }
+    75→
+    76→  return (
+    77→    <div className="min-h-screen bg-mystic-gradient relative overflow-hidden">
+    78→      {/* 星空背景层 */}
+    79→      <div className="absolute inset-0 starfield opacity-30 pointer-events-none" />
+    80→
+    81→      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+    82→        <Header />
+    83→        <ProfileSection />
+    84→        <ModuleTabs />
+    85→        <Footer />
+    86→      </div>
+    87→      <Toaster />
+    88→    </div>
+    89→  );
+    90→}
+    91→
+    92→// ─────────────────────────────────────────────
+    93→// 顶部 Header
+    94→// ─────────────────────────────────────────────
+    95→function Header() {
+    96→  return (
+    97→    <header className="text-center mb-8 sm:mb-12">
+    98→      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-card-dark text-xs tracking-widest text-gold mb-4">
+    99→        <Sparkles className="w-3 h-3" />
+   100→        <span>MYSTIC AI · BETA</span>
+   101→      </div>
+   102→      <h1
+   103→        className="text-4xl sm:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 text-shadow-gold"
+   104→        style={{ fontFamily: 'var(--font-cormorant), serif', letterSpacing: '0.02em' }}
+   105→      >
+   106→        Mystic AI
+   107→      </h1>
+   108→      <p className="text-sm sm:text-base text-purple-200/80 mt-2 tracking-wider">
+   109→        AI 原生灵性陪伴 · 占星 · 塔罗 · 解梦 · 命理 · 纪念 · 家谱
+   110→      </p>
+   111→    </header>
+   112→  );
+   113→}
+   114→
+   115→// ─────────────────────────────────────────────
+   116→// 用户档案（出生信息设置）
+   117→// ─────────────────────────────────────────────
+   118→function ProfileSection() {
+   119→  const { user, updateProfile } = useSession();
+   120→  const { toast } = useToast();
+   121→  const [editing, setEditing] = useState(false);
+   122→  const [form, setForm] = useState({
+   123→    name: user?.name || '',
+   124→    birthDate: user?.birthDate || '',
+   125→    birthTime: user?.birthTime || '',
+   126→    birthPlace: user?.birthPlace || '',
+   127→    gender: user?.gender || '',
+   128→  });
+   129→
+   130→  const save = async () => {
+   131→    if (!user) return;
+   132→    // 乐观更新
+   133→    updateProfile(form);
+   134→    setEditing(false);
+   135→    toast({ title: '档案已保存', description: '你的出生信息已更新' });
+   136→    // 后台同步到 DB
+   137→    fetch('/api/user', {
+   138→      method: 'POST',
+   139→      headers: { 'Content-Type': 'application/json' },
+   140→      body: JSON.stringify({ userId: user.userId, profile: form }),
+   141→    }).catch((e) => console.error('profile sync error:', e));
+   142→  };
+   143→
+   144→  if (!user) return null;
+   145→
+   146→  return (
+   147→    <Card className="glass-card-dark mb-8 border-gold/30">
+   148→      <CardHeader className="pb-3">
+   149→        <div className="flex items-center justify-between flex-wrap gap-3">
+   150→          <div className="flex items-center gap-3">
+   151→            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+   152→              {(user.name || 'A')[0].toUpperCase()}
+   153→            </div>
+   154→            <div>
+   155→              <CardTitle className="text-base text-gold flex items-center gap-2">
+   156→                {user.name || '匿名旅人'}
+   157→                <Badge variant="outline" className="text-xs border-gold/50 text-gold">
+   158→                  {user.plan === 'free' ? '体验版' : user.plan === 'pro' ? 'PRO' : 'PREMIUM'}
+   159→                </Badge>
+   160→              </CardTitle>
+   161→              <CardDescription className="text-purple-200/70 text-xs mt-0.5">
+   162→                {user.birthDate ? `出生 ${user.birthDate} ${user.birthTime || ''}` : '未填写出生信息（影响占星/命理精度）'}
+   163→              </CardDescription>
+   164→            </div>
+   165→          </div>
+   166→          <Button
+   167→            variant="ghost"
+   168→            size="sm"
+   169→            className="text-gold hover:text-amber-200 hover:bg-gold/10"
+   170→            onClick={() => setEditing(!editing)}
+   171→          >
+   172→            {editing ? '取消' : '编辑档案'}
+   173→          </Button>
+   174→        </div>
+   175→      </CardHeader>
+   176→      {editing && (
+   177→        <CardContent className="space-y-3 pt-2 border-t border-gold/20">
+   178→          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+   179→            <div>
+   180→              <Label className="text-purple-200/80 text-xs">姓名/昵称</Label>
+   181→              <Input
+   182→                value={form.name}
+   183→                onChange={(e) => setForm({ ...form, name: e.target.value })}
+   184→                placeholder="你的称呼"
+   185→                className="bg-white/5 border-gold/30 text-white"
+   186→              />
+   187→            </div>
+   188→            <div>
+   189→              <Label className="text-purple-200/80 text-xs">出生日期</Label>
+   190→              <Input
+   191→                type="date"
+   192→                value={form.birthDate}
+   193→                onChange={(e) => setForm({ ...form, birthDate: e.target.value })}
+   194→                className="bg-white/5 border-gold/30 text-white"
+   195→              />
+   196→            </div>
+   197→            <div>
+   198→              <Label className="text-purple-200/80 text-xs">出生时间（可选）</Label>
+   199→              <Input
+   200→                type="time"
+   201→                value={form.birthTime}
+   202→                onChange={(e) => setForm({ ...form, birthTime: e.target.value })}
+   203→                className="bg-white/5 border-gold/30 text-white"
+   204→              />
+   205→            </div>
+   206→            <div>
+   207→              <Label className="text-purple-200/80 text-xs">出生地点（可选）</Label>
+   208→              <Input
+   209→                value={form.birthPlace}
+   210→                onChange={(e) => setForm({ ...form, birthPlace: e.target.value })}
+   211→                placeholder="如：北京 / New York"
+   212→                className="bg-white/5 border-gold/30 text-white"
+   213→              />
+   214→            </div>
+   215→            <div>
+   216→              <Label className="text-purple-200/80 text-xs">性别</Label>
+   217→              <Select value={form.gender} onValueChange={(v) => setForm({ ...form, gender: v })}>
+   218→                <SelectTrigger className="bg-white/5 border-gold/30 text-white">
+   219→                  <SelectValue placeholder="选择性别" />
+   220→                </SelectTrigger>
+   221→                <SelectContent>
+   222→                  <SelectItem value="female">女</SelectItem>
+   223→                  <SelectItem value="male">男</SelectItem>
+   224→                  <SelectItem value="other">其他</SelectItem>
+   225→                </SelectContent>
+   226→              </Select>
+   227→            </div>
+   228→          </div>
+   229→          <Button onClick={save} className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500">
+   230→            <Sparkles className="w-4 h-4 mr-2" /> 保存档案
+   231→          </Button>
+   232→        </CardContent>
+   233→      )}
+   234→    </Card>
+   235→  );
+   236→}
+   237→
+   238→// ─────────────────────────────────────────────
+   239→// 模块 Tabs
+   240→// ─────────────────────────────────────────────
+   241→function ModuleTabs() {
+   242→  return (
+   243→    <Tabs defaultValue="daily" className="w-full">
+   244→      <TabsList className="grid w-full grid-cols-4 sm:grid-cols-7 h-auto bg-white/5 border border-gold/20 p-1 rounded-xl gap-1">
+   245→        <TabsTrigger value="daily" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-purple-200/70 text-xs sm:text-sm py-2">
+   246→          <Sun className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />每日
+   247→        </TabsTrigger>
+   248→        <TabsTrigger value="astrology" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-purple-200/70 text-xs sm:text-sm py-2">
+   249→          <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />占星
+   250→        </TabsTrigger>
+   251→        <TabsTrigger value="tarot" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-purple-200/70 text-xs sm:text-sm py-2">
+   252→          <Gem className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />塔罗
+   253→        </TabsTrigger>
+   254→        <TabsTrigger value="dream" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-purple-200/70 text-xs sm:text-sm py-2">
+   255→          <Moon className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />解梦
+   256→        </TabsTrigger>
+   257→        <TabsTrigger value="bazi" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-purple-200/70 text-xs sm:text-sm py-2">
+   258→          <Hash className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />命理
+   259→        </TabsTrigger>
+   260→        <TabsTrigger value="memorial" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-purple-200/70 text-xs sm:text-sm py-2">
+   261→          <Ghost className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />纪念
+   262→        </TabsTrigger>
+   263→        <TabsTrigger value="genealogy" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-purple-200/70 text-xs sm:text-sm py-2">
+   264→          <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />家谱
+   265→        </TabsTrigger>
+   266→      </TabsList>
+   267→
+   268→      <TabsContent value="daily" className="mt-6"><DailyModule /></TabsContent>
+   269→      <TabsContent value="astrology" className="mt-6"><AstrologyModule /></TabsContent>
+   270→      <TabsContent value="tarot" className="mt-6"><TarotModule /></TabsContent>
+   271→      <TabsContent value="dream" className="mt-6"><DreamModule /></TabsContent>
+   272→      <TabsContent value="bazi" className="mt-6"><BaziModule /></TabsContent>
+   273→      <TabsContent value="memorial" className="mt-6"><MemorialModule /></TabsContent>
+   274→      <TabsContent value="genealogy" className="mt-6"><GenealogyModule /></TabsContent>
+   275→    </Tabs>
+   276→  );
+   277→}
+   278→
+   279→// ─────────────────────────────────────────────
+   280→// 通用调用 hook
+   281→// ─────────────────────────────────────────────
+   282→function useMysticCall() {
+   283→  const { user } = useSession();
+   284→  const { toast } = useToast();
+   285→  const [loading, setLoading] = useState(false);
+   286→  const [result, setResult] = useState<string>('');
+   287→  const [metadata, setMetadata] = useState<any>(null);
+   288→
+   289→  const call = useCallback(async (module: Module, input: any) => {
+   290→    setLoading(true);
+   291→    setResult('');
+   292→    setMetadata(null);
+   293→    try {
+   294→      const res = await fetch('/api/mystic', {
+   295→        method: 'POST',
+   296→        headers: { 'Content-Type': 'application/json' },
+   297→        body: JSON.stringify({ module, input, userId: user?.userId }),
+   298→      });
+   299→      const data = await res.json();
+   300→      if (!res.ok || !data.success) {
+   301→        throw new Error(data.error || 'AI 调用失败');
+   302→      }
+   303→      setResult(data.result);
+   304→      setMetadata(data.metadata);
+   305→      toast({ title: '✨ 解读完成', description: '宇宙的信息已传递给你' });
+   306→    } catch (e: any) {
+   307→      toast({
+   308→        title: '调用失败',
+   309→        description: e?.message || '请稍后再试',
+   310→        variant: 'destructive',
+   311→      });
+   312→    } finally {
+   313→      setLoading(false);
+   314→    }
+   315→  }, [user, toast]);
+   316→
+   317→  return { loading, result, metadata, call, setResult };
+   318→}
+   319→
+   320→// ─────────────────────────────────────────────
+   321→// AI 结果渲染组件
+   322→// ─────────────────────────────────────────────
+   323→function AIResult({ result, loading }: { result: string; loading: boolean }) {
+   324→  if (loading) {
+   325→    return (
+   326→      <Card className="glass-card-dark border-gold/30 mt-4">
+   327→        <CardContent className="py-12 flex flex-col items-center gap-3">
+   328→          <div className="relative">
+   329→            <Moon className="w-12 h-12 text-gold animate-float" />
+   330→            <Sparkles className="w-4 h-4 text-amber-200 absolute -top-1 -right-1 animate-pulse" />
+   331→          </div>
+   332→          <p className="text-purple-200/80 text-sm tracking-widest">宇宙正在传递信息...</p>
+   333→          <Progress value={66} className="w-48 h-1 bg-white/10" />
+   334→        </CardContent>
+   335→      </Card>
+   336→    );
+   337→  }
+   338→  if (!result) return null;
+   339→  return (
+   340→    <Card className="glass-card-dark border-gold/30 mt-4 animate-glow-pulse">
+   341→      <CardContent className="pt-6">
+   342→        <div className="prose prose-invert max-w-none">
+   343→          <div className="text-purple-50/90 leading-relaxed space-y-3 text-sm sm:text-base">
+   344→            <ReactMarkdown
+   345→              components={{
+   346→                h1: ({ children }) => <h1 className="text-2xl font-bold text-gold mt-4 mb-2">{children}</h1>,
+   347→                h2: ({ children }) => <h2 className="text-xl font-semibold text-amber-200 mt-4 mb-2">{children}</h2>,
+   348→                h3: ({ children }) => <h3 className="text-base font-semibold text-amber-100 mt-3 mb-1">{children}</h3>,
+   349→                p: ({ children }) => <p className="text-purple-50/85 leading-relaxed">{children}</p>,
+   350→                ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 text-purple-50/85">{children}</ul>,
+   351→                ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 text-purple-50/85">{children}</ol>,
+   352→                strong: ({ children }) => <strong className="text-amber-200 font-semibold">{children}</strong>,
+   353→                blockquote: ({ children }) => <blockquote className="border-l-2 border-gold/50 pl-4 italic text-purple-200/70 my-2">{children}</blockquote>,
+   354→              }}
+   355→            >
+   356→              {result}
+   357→            </ReactMarkdown>
+   358→          </div>
+   359→        </div>
+   360→      </CardContent>
+   361→    </Card>
+   362→  );
+   363→}
+   364→
+   365→// ─────────────────────────────────────────────
+   366→// 模块 1：每日能量报告
+   367→// ─────────────────────────────────────────────
+   368→function DailyModule() {
+   369→  const { user } = useSession();
+   370→  const { loading, result, metadata, call } = useMysticCall();
+   371→  const [focus, setFocus] = useState('');
+   372→
+   373→  const today = new Date().toLocaleDateString('zh-CN', { weekday: 'long', month: 'long', day: 'numeric' });
+   374→
+   375→  return (
+   376→    <div className="space-y-4">
+   377→      <ModuleHeader
+   378→        icon={<Sun className="w-5 h-5" />}
+   379→        title="今日能量报告"
+   380→        subtitle={`今天是 ${today} · AI 融合占星·塔罗·月相·数字能量学`}
+   381→      />
+   382→
+   383→      <Card className="glass-card-dark border-gold/30">
+   384→        <CardContent className="pt-6 space-y-4">
+   385→          <div>
+   386→            <Label className="text-purple-200/80 text-xs mb-2 block">今日关注（可选）</Label>
+   387→            <Input
+   388→              value={focus}
+   389→              onChange={(e) => setFocus(e.target.value)}
+   390→              placeholder="如：今天的面试 / 与TA的关系 / 工作压力..."
+   391→              className="bg-white/5 border-gold/30 text-white"
+   392→            />
+   393→          </div>
+   394→          <Button
+   395→            onClick={() => call('daily', {
+   396→              birthDate: user?.birthDate,
+   397→              sunSign: user?.birthDate,
+   398→              focus,
+   399→            })}
+   400→            disabled={loading}
+   401→            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500"
+   402→          >
+   403→            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+   404→            生成今日能量报告
+   405→          </Button>
+   406→        </CardContent>
+   407→      </Card>
+   408→
+   409→      {metadata?.moonPhase && (
+   410→        <div className="flex items-center justify-center gap-3 text-purple-200/80 text-sm">
+   411→          <span className="text-2xl">{metadata.moonPhase.emoji}</span>
+   412→          <span>今日月相：<span className="text-gold">{metadata.moonPhase.phase}</span> · {metadata.moonPhase.meaning}</span>
+   413→        </div>
+   414→      )}
+   415→
+   416→      <AIResult result={result} loading={loading} />
+   417→    </div>
+   418→  );
+   419→}
+   420→
+   421→// ─────────────────────────────────────────────
+   422→// 模块 2：占星本命盘
+   423→// ─────────────────────────────────────────────
+   424→function AstrologyModule() {
+   425→  const { user } = useSession();
+   426→  const { loading, result, metadata, call } = useMysticCall();
+   427→  const [question, setQuestion] = useState('');
+   428→
+   429→  return (
+   430→    <div className="space-y-4">
+   431→      <ModuleHeader
+   432→        icon={<Star className="w-5 h-5" />}
+   433→        title="AI 占星本命盘解读"
+   434→        subtitle="输入出生信息 · AI 深度解读太阳/月亮/上升星座的协同"
+   435→      />
+   436→
+   437→      <Card className="glass-card-dark border-gold/30">
+   438→        <CardContent className="pt-6 space-y-4">
+   439→          {user?.birthDate ? (
+   440→            <div className="flex items-center gap-3 text-sm">
+   441→              <Calendar className="w-4 h-4 text-gold" />
+   442→              <span className="text-purple-100">已记录：{user.birthDate} {user.birthTime || ''} {user.birthPlace || ''}</span>
+   443→              <Badge variant="outline" className="border-gold/40 text-gold">
+   444→                {metadata?.sunSign || '太阳星座待计算'}
+   445→              </Badge>
+   446→            </div>
+   447→          ) : (
+   448→            <p className="text-purple-200/70 text-sm">请先在顶部"编辑档案"中填写出生日期</p>
+   449→          )}
+   450→
+   451→          <div>
+   452→            <Label className="text-purple-200/80 text-xs mb-2 block">想了解的问题（可选）</Label>
+   453→            <Textarea
+   454→              value={question}
+   455→              onChange={(e) => setQuestion(e.target.value)}
+   456→              placeholder="如：我的人生主题是什么？我的灵魂使命？我的爱情会如何发展？"
+   457→              className="bg-white/5 border-gold/30 text-white min-h-[80px]"
+   458→            />
+   459→          </div>
+   460→
+   461→          <Button
+   462→            onClick={() => call('astrology', {
+   463→              birthDate: user?.birthDate || '1995-01-01',
+   464→              birthTime: user?.birthTime || '',
+   465→              birthPlace: user?.birthPlace || '',
+   466→              gender: user?.gender || '',
+   467→              question,
+   468→            })}
+   469→            disabled={loading || !user?.birthDate}
+   470→            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500"
+   471→          >
+   472→            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Star className="w-4 h-4 mr-2" />}
+   473→            解读本命盘
+   474→          </Button>
+   475→        </CardContent>
+   476→      </Card>
+   477→
+   478→      <AIResult result={result} loading={loading} />
+   479→    </div>
+   480→  );
+   481→}
+   482→
+   483→// ─────────────────────────────────────────────
+   484→// 模块 3：塔罗占卜
+   485→// ─────────────────────────────────────────────
+   486→function TarotModule() {
+   487→  const { loading, result, metadata, call } = useMysticCall();
+   488→  const [question, setQuestion] = useState('');
+   489→  const [cardCount, setCardCount] = useState(3);
+   490→
+   491→  return (
+   492→    <div className="space-y-4">
+   493→      <ModuleHeader
+   494→        icon={<Gem className="w-5 h-5" />}
+   495→        title="AI 塔罗占卜"
+   496→        subtitle="抽牌 · AI 深度解读牌阵 · 多框架启示"
+   497→      />
+   498→
+   499→      <Card className="glass-card-dark border-gold/30">
+   500→        <CardContent className="pt-6 space-y-4">
+   501→          <div>
+   502→            <Label className="text-purple-200/80 text-xs mb-2 block">你的问题</Label>
+   503→            <Textarea
+   504→              value={question}
+   505→              onChange={(e) => setQuestion(e.target.value)}
+   506→              placeholder="如：我的事业会顺利吗？我应该接受这份工作吗？我和TA的关系未来？"
+   507→              className="bg-white/5 border-gold/30 text-white min-h-[80px]"
+   508→            />
+   509→          </div>
+   510→          <div>
+   511→            <Label className="text-purple-200/80 text-xs mb-2 block">牌阵大小</Label>
+   512→            <Select value={String(cardCount)} onValueChange={(v) => setCardCount(Number(v))}>
+   513→              <SelectTrigger className="bg-white/5 border-gold/30 text-white">
+   514→                <SelectValue />
+   515→              </SelectTrigger>
+   516→              <SelectContent>
+   517→                <SelectItem value="3">3 张（过去·现在·未来）</SelectItem>
+   518→                <SelectItem value="5">5 张（扩展牌阵）</SelectItem>
+   519→                <SelectItem value="7">7 张（深度牌阵）</SelectItem>
+   520→              </SelectContent>
+   521→            </Select>
+   522→          </div>
+   523→          <Button
+   524→            onClick={() => call('tarot', { question, cardCount })}
+   525→            disabled={loading}
+   526→            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500"
+   527→          >
+   528→            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+   529→            抽牌占卜
+   530→          </Button>
+   531→        </CardContent>
+   532→      </Card>
+   533→
+   534→      {metadata?.cards && (
+   535→        <Card className="glass-card-dark border-gold/30">
+   536→          <CardHeader className="pb-2">
+   537→            <CardTitle className="text-base text-gold flex items-center gap-2">
+   538→              <Gem className="w-4 h-4" /> 抽到的牌
+   539→            </CardTitle>
+   540→          </CardHeader>
+   541→          <CardContent>
+   542→            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+   543→              {metadata.cards.map((c: any, i: number) => (
+   544→                <div key={i} className="bg-gradient-to-br from-purple-900/60 to-indigo-900/40 border border-gold/30 rounded-lg p-3 animate-card-flip" style={{ animationDelay: `${i * 0.15}s` }}>
+   545→                  <div className="flex items-center justify-between mb-2">
+   546→                    <Badge variant="outline" className="text-gold border-gold/40 text-xs">{c.position}</Badge>
+   547→                    {c.reversed && <Badge variant="outline" className="text-red-300 border-red-300/40 text-xs">逆位</Badge>}
+   548→                  </div>
+   549→                  <div className="text-2xl text-center my-2 text-gold font-bold" style={{ fontFamily: 'var(--font-cormorant)' }}>
+   550→                    {c.card.symbol}
+   551→                  </div>
+   552→                  <p className="text-amber-100 font-medium text-sm text-center">{c.card.name}</p>
+   553→                  <p className="text-purple-200/60 text-xs text-center mt-1">{c.card.keywords}</p>
+   554→                </div>
+   555→              ))}
+   556→            </div>
+   557→          </CardContent>
+   558→        </Card>
+   559→      )}
+   560→
+   561→      <AIResult result={result} loading={loading} />
+   562→    </div>
+   563→  );
+   564→}
+   565→
+   566→// ─────────────────────────────────────────────
+   567→// 模块 4：解梦日记
+   568→// ─────────────────────────────────────────────
+   569→function DreamModule() {
+   570→  const { loading, result, call } = useMysticCall();
+   571→  const [title, setTitle] = useState('');
+   572→  const [content, setContent] = useState('');
+   573→  const [mood, setMood] = useState('');
+   574→  const [framework, setFramework] = useState('jungian');
+   575→  const [context, setContext] = useState('');
+   576→
+   577→  return (
+   578→    <div className="space-y-4">
+   579→      <ModuleHeader
+   580→        icon={<Moon className="w-5 h-5" />}
+   581→        title="AI 解梦日记"
+   582→        subtitle="记录梦境 · AI 多框架解读 · 长期潜意识追踪"
+   583→      />
+   584→
+   585→      <Card className="glass-card-dark border-gold/30">
+   586→        <CardContent className="pt-6 space-y-4">
+   587→          <div>
+   588→            <Label className="text-purple-200/80 text-xs mb-2 block">梦境标题</Label>
+   589→            <Input
+   590→              value={title}
+   591→              onChange={(e) => setTitle(e.target.value)}
+   592→              placeholder="如：飞翔在大海上空"
+   593→              className="bg-white/5 border-gold/30 text-white"
+   594→            />
+   595→          </div>
+   596→          <div>
+   597→            <Label className="text-purple-200/80 text-xs mb-2 block">梦境内容（详细描述）</Label>
+   598→            <Textarea
+   599→              value={content}
+   600→              onChange={(e) => setContent(e.target.value)}
+   601→              placeholder="尽量详细地记录梦境：人物、场景、情节、感受..."
+   602→              className="bg-white/5 border-gold/30 text-white min-h-[120px]"
+   603→            />
+   604→          </div>
+   605→          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+   606→            <div>
+   607→              <Label className="text-purple-200/80 text-xs mb-2 block">梦境情绪</Label>
+   608→              <Select value={mood} onValueChange={setMood}>
+   609→                <SelectTrigger className="bg-white/5 border-gold/30 text-white">
+   610→                  <SelectValue placeholder="选择主要情绪" />
+   611→                </SelectTrigger>
+   612→                <SelectContent>
+   613→                  <SelectItem value="calm">平静</SelectItem>
+   614→                  <SelectItem value="joy">喜悦</SelectItem>
+   615→                  <SelectItem value="fear">恐惧</SelectItem>
+   616→                  <SelectItem value="anxious">焦虑</SelectItem>
+   617→                  <SelectItem value="sad">悲伤</SelectItem>
+   618→                  <SelectItem value="confused">困惑</SelectItem>
+   619→                  <SelectItem value="mysterious">神秘</SelectItem>
+   620→                </SelectContent>
+   621→              </Select>
+   622→            </div>
+   623→            <div>
+   624→              <Label className="text-purple-200/80 text-xs mb-2 block">解读框架</Label>
+   625→              <Select value={framework} onValueChange={setFramework}>
+   626→                <SelectTrigger className="bg-white/5 border-gold/30 text-white">
+   627→                  <SelectValue />
+   628→                </SelectTrigger>
+   629→                <SelectContent>
+   630→                  <SelectItem value="jungian">荣格原型</SelectItem>
+   631→                  <SelectItem value="freudian">弗洛伊德精神分析</SelectItem>
+   632→                  <SelectItem value="gestalt">格式塔投射</SelectItem>
+   633→                  <SelectItem value="spiritual">灵性视角</SelectItem>
+   634→                </SelectContent>
+   635→              </Select>
+   636→            </div>
+   637→          </div>
+   638→          <div>
+   639→            <Label className="text-purple-200/80 text-xs mb-2 block">现实背景（可选）</Label>
+   640→            <Input
+   641→              value={context}
+   642→              onChange={(e) => setContext(e.target.value)}
+   643→              placeholder="如：最近工作压力大 / 刚分手 / 准备考试..."
+   644→              className="bg-white/5 border-gold/30 text-white"
+   645→            />
+   646→          </div>
+   647→          <Button
+   648→            onClick={() => call('dream', { title, content, mood, framework, context })}
+   649→            disabled={loading || !title || !content}
+   650→            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500"
+   651→          >
+   652→            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Moon className="w-4 h-4 mr-2" />}
+   653→            解读梦境
+   654→          </Button>
+   655→        </CardContent>
+   656→      </Card>
+   657→
+   658→      <AIResult result={result} loading={loading} />
+   659→    </div>
+   660→  );
+   661→}
+   662→
+   663→// ─────────────────────────────────────────────
+   664→// 模块 5：命理八字
+   665→// ─────────────────────────────────────────────
+   666→function BaziModule() {
+   667→  const { user } = useSession();
+   668→  const { loading, result, metadata, call } = useMysticCall();
+   669→  const [question, setQuestion] = useState('');
+   670→
+   671→  return (
+   672→    <div className="space-y-4">
+   673→      <ModuleHeader
+   674→        icon={<Hash className="w-5 h-5" />}
+   675→        title="AI 命理八字解读"
+   676→        subtitle="天干地支 · 五行生克 · 十神关系 · 大运流年"
+   677→      />
+   678→
+   679→      <Card className="glass-card-dark border-gold/30">
+   680→        <CardContent className="pt-6 space-y-4">
+   681→          {user?.birthDate ? (
+   682→            <div className="flex items-center gap-3 text-sm">
+   683→              <Calendar className="w-4 h-4 text-gold" />
+   684→              <span className="text-purple-100">已记录：{user.birthDate} {user.birthTime || ''}</span>
+   685→              {metadata?.dayMaster && (
+   686→                <Badge variant="outline" className="border-gold/40 text-gold">
+   687→                  日主：{metadata.dayMaster}
+   688→                </Badge>
+   689→              )}
+   690→            </div>
+   691→          ) : (
+   692→            <p className="text-purple-200/70 text-sm">请先在顶部"编辑档案"中填写出生日期</p>
+   693→          )}
+   694→          <div>
+   695→            <Label className="text-purple-200/80 text-xs mb-2 block">想了解（可选）</Label>
+   696→            <Input
+   697→              value={question}
+   698→              onChange={(e) => setQuestion(e.target.value)}
+   699→              placeholder="如：事业财运 / 感情婚姻 / 健康 / 大运"
+   700→              className="bg-white/5 border-gold/30 text-white"
+   701→            />
+   702→          </div>
+   703→          <Button
+   704→            onClick={() => call('bazi', {
+   705→              birthDate: user?.birthDate || '1995-01-01',
+   706→              birthTime: user?.birthTime || '',
+   707→              gender: user?.gender || '',
+   708→              question,
+   709→            })}
+   710→            disabled={loading || !user?.birthDate}
+   711→            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500"
+   712→          >
+   713→            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Hash className="w-4 h-4 mr-2" />}
+   714→            解读命盘
+   715→          </Button>
+   716→        </CardContent>
+   717→      </Card>
+   718→
+   719→      <AIResult result={result} loading={loading} />
+   720→    </div>
+   721→  );
+   722→}
+   723→
+   724→// ─────────────────────────────────────────────
+   725→// 模块 6：AI 数字纪念
+   726→// ─────────────────────────────────────────────
+   727→function MemorialModule() {
+   728→  const { loading, result, call } = useMysticCall();
+   729→  const [form, setForm] = useState({
+   730→    personName: '',
+   731→    relationship: '',
+   732→    birthYear: '',
+   733→    deathYear: '',
+   734→    personality: '',
+   735→    memories: '',
+   736→    userFeeling: '',
+   737→  });
+   738→
+   739→  return (
+   740→    <div className="space-y-4">
+   741→      <ModuleHeader
+   742→        icon={<Ghost className="w-5 h-5" />}
+   743→        title="AI 数字纪念"
+   744→        subtitle="为逝去的亲人/朋友/宠物撰写纪念传记 · 收到一封来自TA的信"
+   745→      />
+   746→
+   747→      <Card className="glass-card-dark border-gold/30">
+   748→        <CardContent className="pt-6 space-y-4">
+   749→          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+   750→            <div>
+   751→              <Label className="text-purple-200/80 text-xs mb-2 block">纪念对象姓名</Label>
+   752→              <Input
+   753→                value={form.personName}
+   754→                onChange={(e) => setForm({ ...form, personName: e.target.value })}
+   755→                placeholder="如：外婆 / 小白 / 老张"
+   756→                className="bg-white/5 border-gold/30 text-white"
+   757→              />
+   758→            </div>
+   759→            <div>
+   760→              <Label className="text-purple-200/80 text-xs mb-2 block">与你的关系</Label>
+   761→              <Select value={form.relationship} onValueChange={(v) => setForm({ ...form, relationship: v })}>
+   762→                <SelectTrigger className="bg-white/5 border-gold/30 text-white">
+   763→                  <SelectValue placeholder="选择关系" />
+   764→                </SelectTrigger>
+   765→                <SelectContent>
+   766→                  <SelectItem value="grandparent">祖父母</SelectItem>
+   767→                  <SelectItem value="parent">父母</SelectItem>
+   768→                  <SelectItem value="spouse">配偶</SelectItem>
+   769→                  <SelectItem value="sibling">兄弟姐妹</SelectItem>
+   770→                  <SelectItem value="friend">朋友</SelectItem>
+   771→                  <SelectItem value="pet">宠物</SelectItem>
+   772→                  <SelectItem value="other">其他</SelectItem>
+   773→                </SelectContent>
+   774→              </Select>
+   775→            </div>
+   776→            <div>
+   777→              <Label className="text-purple-200/80 text-xs mb-2 block">出生年份</Label>
+   778→              <Input
+   779→                value={form.birthYear}
+   780→                onChange={(e) => setForm({ ...form, birthYear: e.target.value })}
+   781→                placeholder="如：1945"
+   782→                className="bg-white/5 border-gold/30 text-white"
+   783→              />
+   784→            </div>
+   785→            <div>
+   786→              <Label className="text-purple-200/80 text-xs mb-2 block">离世年份</Label>
+   787→              <Input
+   788→                value={form.deathYear}
+   789→                onChange={(e) => setForm({ ...form, deathYear: e.target.value })}
+   790→                placeholder="如：2023"
+   791→                className="bg-white/5 border-gold/30 text-white"
+   792→              />
+   793→            </div>
+   794→          </div>
+   795→          <div>
+   796→            <Label className="text-purple-200/80 text-xs mb-2 block">TA的性格特点</Label>
+   797→            <Textarea
+   798→              value={form.personality}
+   799→              onChange={(e) => setForm({ ...form, personality: e.target.value })}
+   800→              placeholder="如：温柔、爱笑、做菜很好吃、爱讲过去的故事..."
+   801→              className="bg-white/5 border-gold/30 text-white min-h-[80px]"
+   802→            />
+   803→          </div>
+   804→          <div>
+   805→            <Label className="text-purple-200/80 text-xs mb-2 block">美好回忆</Label>
+   806→            <Textarea
+   807→              value={form.memories}
+   808→              onChange={(e) => setForm({ ...form, memories: e.target.value })}
+   809→              placeholder="你最想留住的、关于TA的画面和瞬间..."
+   810→              className="bg-white/5 border-gold/30 text-white min-h-[100px]"
+   811→            />
+   812→          </div>
+   813→          <div>
+   814→            <Label className="text-purple-200/80 text-xs mb-2 block">你想对TA说的话</Label>
+   815→            <Input
+   816→              value={form.userFeeling}
+   817→              onChange={(e) => setForm({ ...form, userFeeling: e.target.value })}
+   818→              placeholder="如：好想你 / 谢谢你 / 对不起..."
+   819→              className="bg-white/5 border-gold/30 text-white"
+   820→            />
+   821→          </div>
+   822→          <Button
+   823→            onClick={() => call('memorial', form)}
+   824→            disabled={loading || !form.personName}
+   825→            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500"
+   826→          >
+   827→            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Heart className="w-4 h-4 mr-2" />}
+   828→            撰写纪念
+   829→          </Button>
+   830→        </CardContent>
+   831→      </Card>
+   832→
+   833→      <AIResult result={result} loading={loading} />
+   834→    </div>
+   835→  );
+   836→}
+   837→
+   838→// ─────────────────────────────────────────────
+   839→// 模块 7：AI 家谱故事
+   840→// ─────────────────────────────────────────────
+   841→function GenealogyModule() {
+   842→  const { loading, result, call } = useMysticCall();
+   843→  const [form, setForm] = useState({
+   844→    familyName: '',
+   845→    members: '',
+   846→    origins: '',
+   847→    traditions: '',
+   848→    focus: '',
+   849→  });
+   850→
+   851→  return (
+   852→    <div className="space-y-4">
+   853→      <ModuleHeader
+   854→        icon={<Users className="w-5 h-5" />}
+   855→        title="AI 家谱故事"
+   856→        subtitle="将家族成员、起源、传统编织成动人的家族叙事"
+   857→      />
+   858→
+   859→      <Card className="glass-card-dark border-gold/30">
+   860→        <CardContent className="pt-6 space-y-4">
+   861→          <div>
+   862→            <Label className="text-purple-200/80 text-xs mb-2 block">家族姓氏</Label>
+   863→            <Input
+   864→              value={form.familyName}
+   865→              onChange={(e) => setForm({ ...form, familyName: e.target.value })}
+   866→              placeholder="如：王家 / Smith 家族"
+   867→              className="bg-white/5 border-gold/30 text-white"
+   868→            />
+   869→          </div>
+   870→          <div>
+   871→            <Label className="text-purple-200/80 text-xs mb-2 block">已知家族成员</Label>
+   872→            <Textarea
+   873→              value={form.members}
+   874→              onChange={(e) => setForm({ ...form, members: e.target.value })}
+   875→              placeholder="如：祖父王大山（铁匠）、祖母李秀英、父亲王建国（教师）..."
+   876→              className="bg-white/5 border-gold/30 text-white min-h-[100px]"
+   877→            />
+   878→          </div>
+   879→          <div>
+   880→            <Label className="text-purple-200/80 text-xs mb-2 block">家族起源（传说或史实）</Label>
+   881→            <Textarea
+   882→              value={form.origins}
+   883→              onChange={(e) => setForm({ ...form, origins: e.target.value })}
+   884→              placeholder="如：祖上从山西洪洞大槐树迁来 / 19世纪从爱尔兰移民美国..."
+   885→              className="bg-white/5 border-gold/30 text-white min-h-[80px]"
+   886→            />
+   887→          </div>
+   888→          <div>
+   889→            <Label className="text-purple-200/80 text-xs mb-2 block">家族传统与精神</Label>
+   890→            <Textarea
+   891→              value={form.traditions}
+   892→              onChange={(e) => setForm({ ...form, traditions: e.target.value })}
+   893→              placeholder="如：每年春节必回老家 / 家训：耕读传家 / 重教育..."
+   894→              className="bg-white/5 border-gold/30 text-white min-h-[80px]"
+   895→            />
+   896→          </div>
+   897→          <div>
+   898→            <Label className="text-purple-200/80 text-xs mb-2 block">希望突出的主题</Label>
+   899→            <Input
+   900→              value={form.focus}
+   901→              onChange={(e) => setForm({ ...form, focus: e.target.value })}
+   902→              placeholder="如：传承 / 迁徙故事 / 家族精神"
+   903→              className="bg-white/5 border-gold/30 text-white"
+   904→            />
+   905→          </div>
+   906→          <Button
+   907→            onClick={() => call('genealogy', form)}
+   908→            disabled={loading || !form.familyName}
+   909→            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500"
+   910→          >
+   911→            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <BookOpen className="w-4 h-4 mr-2" />}
+   912→            撰写家族故事
+   913→          </Button>
+   914→        </CardContent>
+   915→      </Card>
+   916→
+   917→      <AIResult result={result} loading={loading} />
+   918→    </div>
+   919→  );
+   920→}
+   921→
+   922→// ─────────────────────────────────────────────
+   923→// 通用模块头部
+   924→// ─────────────────────────────────────────────
+   925→function ModuleHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
+   926→  return (
+   927→    <div className="flex items-start gap-3">
+   928→      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/30 to-purple-700/30 border border-gold/40 flex items-center justify-center text-gold shrink-0">
+   929→        {icon}
+   930→      </div>
+   931→      <div>
+   932→        <h2 className="text-lg sm:text-xl font-semibold text-gold">{title}</h2>
+   933→        <p className="text-purple-200/70 text-xs sm:text-sm mt-0.5">{subtitle}</p>
+   934→      </div>
+   935→    </div>
+   936→  );
+   937→}
+   938→
+   939→// ─────────────────────────────────────────────
+   940→// 页脚
+   941→// ─────────────────────────────────────────────
+   942→function Footer() {
+   943→  return (
+   944→    <footer className="mt-12 pt-6 border-t border-gold/20 text-center">
+   945→      <div className="flex items-center justify-center gap-2 text-purple-200/60 text-xs">
+   946→        <Sparkles className="w-3 h-3 text-gold" />
+   947→        <span>Mystic AI · 灵性陪伴超级 App</span>
+   948→        <Sparkles className="w-3 h-3 text-gold" />
+   949→      </div>
+   950→      <p className="text-purple-300/40 text-xs mt-2 max-w-md mx-auto leading-relaxed">
+   951→        本产品提供的所有内容仅供娱乐与灵性探索参考，不构成医疗、心理、法律或投资建议。
+   952→        请以理性态度使用，必要时请寻求专业人士帮助。
+   953→      </p>
+   954→    </footer>
+   955→  );
+   956→}
+   957→

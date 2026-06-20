@@ -1,0 +1,199 @@
+// Lumina Studio - 8 大蓝海赛道统一平台 Schema
+// 涵盖：1.灵性陪伴 2.儿童故事书 3.AI目录站 4.AI Prompt库
+//       5.AI纪念 6.家谱 7.照护者 8.解梦（统一于灵性陪伴）
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String?  @unique
+  name         String?
+  avatar       String?
+  // 用户的出生信息（用于占星、命理计算）
+  birthDate    String?  // YYYY-MM-DD
+  birthTime    String?  // HH:MM
+  birthPlace   String?  // 出生地点
+  birthLat     Float?
+  birthLng     Float?
+  timezone     String?
+  gender       String?  // male/female/other
+  // 订阅状态
+  plan         String   @default("free") // free/pro/premium
+  trialEndsAt  DateTime?
+  // 统计
+  totalReadings Int     @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  readings     Reading[]
+  dreams       Dream[]
+  memorials    Memorial[]
+  genealogies  Genealogy[]
+  dailyReports DailyReport[]
+  storybooks   Storybook[]
+  prompts      PromptItem[]
+  directoryItems DirectoryItem[]
+}
+
+// 占卜记录（占星、塔罗、命理、每日能量通用）
+model Reading {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // astrology/tarot/numerology/bazi/daily
+  question    String?
+  input       String   // JSON
+  result      String   // AI 解读结果（Markdown）
+  metadata    String?  // JSON
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type, createdAt])
+}
+
+// 解梦日记
+model Dream {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  content     String
+  mood        String?
+  framework   String?  // jungian/freudian/gestalt/spiritual
+  interpretation String?
+  tags        String?
+  dreamDate   DateTime
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, dreamDate])
+}
+
+// AI 数字纪念
+model Memorial {
+  id          String   @id @default(cuid())
+  userId      String
+  personName  String
+  relationship String?
+  birthYear   String?
+  deathYear   String?
+  personality String?
+  memories    String?
+  photos      String?
+  biography   String?
+  letterToUser String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// 家谱故事
+model Genealogy {
+  id          String   @id @default(cuid())
+  userId      String
+  familyName  String
+  members     String
+  origins     String?
+  traditions  String?
+  narrative   String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// 每日能量报告
+model DailyReport {
+  id          String   @id @default(cuid())
+  userId      String
+  reportDate  DateTime
+  energyScore Int
+  love        String?
+  career      String?
+  wealth      String?
+  health      String?
+  luckyColor  String?
+  luckyNumber String?
+  summary     String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reportDate])
+  @@index([userId, reportDate])
+}
+
+// AI 个性化儿童故事书
+model Storybook {
+  id          String   @id @default(cuid())
+  userId      String
+  childName   String   // 主角名字
+  childAge    Int      // 孩子年龄
+  theme       String   // 主题：勇敢/友谊/分享/探索/睡前...
+  artStyle    String   // art style: watercolor / cartoon / pixar / anime
+  storyTitle  String?  // AI 生成的故事标题
+  storyText   String?  // AI 生成的故事文本（Markdown）
+  coverPrompt String?  // AI 生成的封面图 Prompt
+  pages       String?  // JSON: 每页文本+配图Prompt
+  moral       String?  // 故事寓意
+  shareUrl    String?  // 分享链接
+  isFavorite  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// AI Prompt 库
+model PromptItem {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  category    String   // writing/image/business/coding/marketing/personal
+  model       String   // chatgpt/claude/gemini/midjourney
+  promptText  String
+  description String?
+  tags        String?  // JSON array
+  isPublic    Boolean  @default(false)
+  isFavorite  Boolean  @default(false)
+  usageCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, category, createdAt])
+  @@index([isPublic, category])
+}
+
+// AI 目录站条目（用户提交的 AI 工具/资源）
+model DirectoryItem {
+  id          String   @id @default(cuid())
+  userId      String?
+  name        String   // 工具名
+  url         String
+  description String
+  category    String   // ai-tool / ai-agent / saas / newsletter / resource
+  tags        String?  // JSON
+  pricing     String?  // free/freemium/paid
+  logoUrl     String?
+  isFeatured  Boolean  @default(false)
+  isApproved  Boolean  @default(true)
+  upvotes     Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([category, isApproved, createdAt])
+  @@index([isFeatured])
+}
