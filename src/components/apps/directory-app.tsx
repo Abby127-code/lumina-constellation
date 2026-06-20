@@ -1,6 +1,6 @@
 'use client';
-// ✦ Lumina Directory — Community Curated AI Tools & Resources Directory
-// CRUD app — emerald/teal theme (no AI call)
+// AI Toolkit — Directory + Prompt Library combined
+// emerald/teal theme
 import { useEffect, useState, useCallback } from 'react';
 import { useSession } from '@/lib/session';
 import { Button } from '@/components/ui/button';
@@ -10,216 +10,239 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { LayoutGrid, Loader2, Plus, ThumbsUp, ExternalLink, Search } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2, LayoutGrid, ThumbsUp, ExternalLink, MessageSquareCode, Copy, Check, Sparkles, Search } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { useToast } from '@/hooks/use-toast';
 
-type DirectoryItem = {
-  id: string;
-  name: string;
-  url: string;
-  description: string;
-  category: string;
-  pricing: string;
-  upvotes: number;
-  createdAt?: string;
-};
-
-const CATEGORIES = [
-  { value: 'all', label: 'All' },
-  { value: 'ai-tool', label: 'AI Tools' },
-  { value: 'ai-agent', label: 'AI Agents' },
-  { value: 'saas', label: 'SaaS' },
-  { value: 'newsletter', label: 'Newsletters' },
-  { value: 'resource', label: 'Resources' },
-];
-
-const PRICING_OPTIONS = ['Free', 'Freemium', 'Paid', 'Open Source'];
+function useAI() {
+  const { user } = useSession();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState('');
+  const call = async (module: string, input: any) => {
+    setLoading(true); setResult('');
+    try {
+      const res = await fetch('/api/mystic', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ module, input, userId: user?.userId }) });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error);
+      setResult(data.result);
+      toast({ title: '✨ Prompt generated' });
+    } catch (e: any) { toast({ title: 'Error', description: e?.message, variant: 'destructive' }); }
+    finally { setLoading(false); }
+  };
+  return { loading, result, call };
+}
 
 export function DirectoryApp() {
+  return (
+    <div className="space-y-4">
+      <Tabs defaultValue="directory">
+        <TabsList className="grid w-full grid-cols-2 bg-white/5 border border-emerald-400/20 p-1 rounded-xl">
+          <TabsTrigger value="directory" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300 text-purple-200/70 text-xs py-2">
+            <LayoutGrid className="w-3 h-3 mr-1" /> AI Tools Directory
+          </TabsTrigger>
+          <TabsTrigger value="prompts" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300 text-purple-200/70 text-xs py-2">
+            <MessageSquareCode className="w-3 h-3 mr-1" /> Prompt Library
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="directory" className="mt-4"><DirectoryTab /></TabsContent>
+        <TabsContent value="prompts" className="mt-4"><PromptsTab /></TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function DirectoryTab() {
+  const { user } = useSession();
   const { toast } = useToast();
-  const [items, setItems] = useState<DirectoryItem[]>([]);
+  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('all');
-  const [showForm, setShowForm] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ name: '', url: '', description: '', category: 'ai-tool', pricing: 'Free' });
-  const [voting, setVoting] = useState<string | null>(null);
+  const [showSubmit, setShowSubmit] = useState(false);
+  const [form, setForm] = useState({ name: '', url: '', description: '', category: 'ai-tool', pricing: 'free' });
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/directory?type=directory&category=${encodeURIComponent(category)}`);
+      const res = await fetch(`/api/directory?type=directory&category=${category}`);
       const data = await res.json();
-      if (res.ok && data.success !== false) {
-        setItems(Array.isArray(data.items) ? data.items : Array.isArray(data) ? data : []);
-      } else {
-        setItems([]);
-      }
-    } catch (e) {
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
+      setItems(data.items || []);
+    } catch {} finally { setLoading(false); }
   }, [category]);
 
   useEffect(() => { load(); }, [load]);
 
-  const submit = async () => {
-    if (!form.name.trim() || !form.url.trim()) {
-      toast({ title: 'Missing fields', description: 'Name and URL are required', variant: 'destructive' });
-      return;
-    }
-    setSubmitting(true);
-    try {
-      const res = await fetch('/api/directory', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'directory', action: 'create', payload: form }),
-      });
-      const data = await res.json();
-      if (!res.ok || data.success === false) throw new Error(data.error || 'Failed to submit');
-      toast({ title: '✓ Submitted', description: 'Your entry has been added' });
-      setForm({ name: '', url: '', description: '', category: 'ai-tool', pricing: 'Free' });
-      setShowForm(false);
-      load();
-    } catch (e: any) {
-      toast({ title: 'Error', description: e?.message, variant: 'destructive' });
-    } finally {
-      setSubmitting(false);
-    }
+  const upvote = async (id: string) => {
+    await fetch('/api/directory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'directory', action: 'upvote', payload: { id } }) });
+    setItems(prev => prev.map(it => it.id === id ? { ...it, upvotes: it.upvotes + 1 } : it));
   };
 
-  const upvote = async (id: string) => {
-    setVoting(id);
+  const submit = async () => {
+    if (!form.name || !form.url) { toast({ title: 'Please fill name and URL', variant: 'destructive' }); return; }
+    const res = await fetch('/api/directory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'directory', action: 'create', payload: { ...form, userId: user?.userId } }) });
+    if (res.ok) { toast({ title: '✅ Submitted' }); setForm({ name: '', url: '', description: '', category: 'ai-tool', pricing: 'free' }); setShowSubmit(false); load(); }
+  };
+
+  const cats = [
+    { id: 'all', name: 'All' }, { id: 'ai-tool', name: 'AI Tools' }, { id: 'ai-agent', name: 'AI Agents' },
+    { id: 'saas', name: 'SaaS' }, { id: 'newsletter', name: 'Newsletter' }, { id: 'resource', name: 'Resources' },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 flex-wrap">
+        {cats.map(c => (
+          <button key={c.id} onClick={() => setCategory(c.id)} className={`px-3 py-1.5 rounded-lg text-xs ${category === c.id ? 'bg-emerald-600 text-white' : 'bg-white/5 text-purple-200/70 hover:bg-emerald-600/20'}`}>{c.name}</button>
+        ))}
+        <div className="flex-1" />
+        <Button size="sm" variant="outline" onClick={() => setShowSubmit(!showSubmit)} className="border-emerald-400/40 text-emerald-300 text-xs">+ Submit</Button>
+      </div>
+      {showSubmit && (
+        <Card className="glass-card-dark border-emerald-400/30">
+          <CardContent className="space-y-3 pt-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Tool name" className="bg-white/5 border-emerald-400/30 text-white" />
+              <Input value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="https://..." className="bg-white/5 border-emerald-400/30 text-white" />
+            </div>
+            <Input value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="One-line description" className="bg-white/5 border-emerald-400/30 text-white" />
+            <div className="grid grid-cols-2 gap-3">
+              <Select value={form.category} onValueChange={v => setForm({ ...form, category: v })}>
+                <SelectTrigger className="bg-white/5 border-emerald-400/30 text-white"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ai-tool">AI Tool</SelectItem><SelectItem value="ai-agent">AI Agent</SelectItem>
+                  <SelectItem value="saas">SaaS</SelectItem><SelectItem value="newsletter">Newsletter</SelectItem>
+                  <SelectItem value="resource">Resource</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={form.pricing} onValueChange={v => setForm({ ...form, pricing: v })}>
+                <SelectTrigger className="bg-white/5 border-emerald-400/30 text-white"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="free">Free</SelectItem><SelectItem value="freemium">Freemium</SelectItem><SelectItem value="paid">Paid</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={submit} className="w-full bg-emerald-600 text-white">Submit</Button>
+          </CardContent>
+        </Card>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {loading ? <div className="col-span-full text-center py-12"><Loader2 className="w-8 h-8 text-emerald-400 animate-spin mx-auto" /></div>
+        : items.length === 0 ? <div className="col-span-full text-center py-12 text-purple-200/60 text-sm">No tools yet. Submit the first!</div>
+        : items.map(item => (
+          <Card key={item.id} className="glass-card-dark border-emerald-400/20 hover:border-emerald-400/50 transition-all">
+            <CardContent className="pt-4 pb-3">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-emerald-200 flex items-center gap-1">{item.name}<ExternalLink className="w-3 h-3 opacity-50" /></h3>
+                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-purple-300/40 text-[10px] hover:text-emerald-300 truncate block">{item.url}</a>
+                </div>
+              </div>
+              <p className="text-purple-100/70 text-xs leading-relaxed mb-3 line-clamp-2">{item.description}</p>
+              <div className="flex items-center justify-between">
+                <Badge variant="outline" className="text-[9px] border-emerald-400/40 text-emerald-300">{item.category}</Badge>
+                <button onClick={() => upvote(item.id)} className="flex items-center gap-1 text-[10px] text-purple-200/60 hover:text-emerald-300"><ThumbsUp className="w-3 h-3" /> {item.upvotes || 0}</button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PromptsTab() {
+  const { user } = useSession();
+  const { toast } = useToast();
+  const { loading, result, call } = useAI();
+  const [items, setItems] = useState<any[]>([]);
+  const [category, setCategory] = useState('all');
+  const [showGen, setShowGen] = useState(false);
+  const [genForm, setGenForm] = useState({ purpose: '', model: 'ChatGPT', style: 'professional', scene: '' });
+  const [copied, setCopied] = useState(false);
+
+  const loadPrompts = useCallback(async () => {
     try {
-      const res = await fetch('/api/directory', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'directory', action: 'upvote', payload: { id } }),
-      });
+      const res = await fetch(`/api/directory?type=prompts&category=${category}`);
       const data = await res.json();
-      if (!res.ok || data.success === false) throw new Error(data.error || 'Failed to upvote');
-      setItems((prev) => prev.map((it) => it.id === id ? { ...it, upvotes: (it.upvotes || 0) + 1 } : it));
-      toast({ title: '👍 Upvoted' });
-    } catch (e: any) {
-      toast({ title: 'Error', description: e?.message, variant: 'destructive' });
-    } finally {
-      setVoting(null);
-    }
+      setItems(data.items || []);
+    } catch {}
+  }, [category]);
+
+  useEffect(() => { loadPrompts(); }, [loadPrompts]);
+
+  const cats = [
+    { id: 'all', name: 'All' }, { id: 'writing', name: 'Writing' }, { id: 'image', name: 'Image' },
+    { id: 'business', name: 'Business' }, { id: 'coding', name: 'Coding' }, { id: 'marketing', name: 'Marketing' },
+  ];
+
+  const copy = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true); toast({ title: '✅ Copied' });
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
     <div className="space-y-4">
-      <Card className="glass-card-dark border-emerald-400/30">
-        <CardContent className="pt-6 space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2 text-emerald-200">
-              <LayoutGrid className="w-5 h-5 text-emerald-300" />
-              <h2 className="text-lg font-semibold">AI Tools & Resources Directory</h2>
+      <div className="flex items-center gap-2 flex-wrap">
+        {cats.map(c => (
+          <button key={c.id} onClick={() => setCategory(c.id)} className={`px-3 py-1.5 rounded-lg text-xs ${category === c.id ? 'bg-emerald-600 text-white' : 'bg-white/5 text-purple-200/70 hover:bg-emerald-600/20'}`}>{c.name}</button>
+        ))}
+        <div className="flex-1" />
+        <Button size="sm" onClick={() => setShowGen(!showGen)} className="bg-emerald-600 text-white text-xs"><Sparkles className="w-3 h-3 mr-1" /> Generate Prompt</Button>
+      </div>
+      {showGen && (
+        <Card className="glass-card-dark border-emerald-400/30">
+          <CardContent className="space-y-3 pt-4">
+            <Input value={genForm.purpose} onChange={e => setGenForm({ ...genForm, purpose: e.target.value })} placeholder="What do you need? e.g., write a blog post" className="bg-white/5 border-emerald-400/30 text-white" />
+            <div className="grid grid-cols-2 gap-3">
+              <Select value={genForm.model} onValueChange={v => setGenForm({ ...genForm, model: v })}>
+                <SelectTrigger className="bg-white/5 border-emerald-400/30 text-white"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ChatGPT">ChatGPT</SelectItem><SelectItem value="Claude">Claude</SelectItem>
+                  <SelectItem value="Gemini">Gemini</SelectItem><SelectItem value="Midjourney">Midjourney</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={genForm.style} onValueChange={v => setGenForm({ ...genForm, style: v })}>
+                <SelectTrigger className="bg-white/5 border-emerald-400/30 text-white"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="professional">Professional</SelectItem><SelectItem value="concise">Concise</SelectItem>
+                  <SelectItem value="detailed">Detailed</SelectItem><SelectItem value="creative">Creative</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Button onClick={() => setShowForm(!showForm)} size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
-              <Plus className="w-4 h-4 mr-1" />Submit
+            <Button onClick={() => call('promptGenerator', genForm)} disabled={loading} className="w-full bg-emerald-600 text-white">
+              {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />} Generate
             </Button>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((c) => (
-              <Button
-                key={c.value}
-                size="sm"
-                variant={category === c.value ? 'default' : 'outline'}
-                onClick={() => setCategory(c.value)}
-                className={category === c.value
-                  ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-200'
-                  : 'border-emerald-400/20 text-emerald-200/70 hover:bg-emerald-500/10'}
-              >
-                {c.label}
-              </Button>
-            ))}
-          </div>
-
-          {showForm && (
-            <div className="space-y-3 p-4 rounded-xl bg-emerald-500/5 border border-emerald-400/20">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-emerald-200/80 text-xs">Name *</Label>
-                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Product name" className="bg-white/5 border-emerald-400/30 text-white" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-emerald-200/80 text-xs">URL *</Label>
-                  <Input value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." className="bg-white/5 border-emerald-400/30 text-white" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-emerald-200/80 text-xs">Category</Label>
-                  <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                    <SelectTrigger className="bg-white/5 border-emerald-400/30 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {CATEGORIES.filter((c) => c.value !== 'all').map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-emerald-200/80 text-xs">Pricing</Label>
-                  <Select value={form.pricing} onValueChange={(v) => setForm({ ...form, pricing: v })}>
-                    <SelectTrigger className="bg-white/5 border-emerald-400/30 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {PRICING_OPTIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-emerald-200/80 text-xs">Description</Label>
-                <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="What does it do? Who is it for?" className="bg-white/5 border-emerald-400/30 text-white min-h-[80px]" />
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={submit} disabled={submitting} className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
-                  {submitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}Submit Entry
-                </Button>
-                <Button onClick={() => setShowForm(false)} variant="outline" className="border-emerald-400/30 text-emerald-200/70">Cancel</Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {loading ? (
-        <Card className="glass-card-dark border-emerald-400/30"><CardContent className="py-12 flex flex-col items-center gap-3"><Loader2 className="w-8 h-8 text-emerald-300 animate-spin" /><p className="text-emerald-200/80 text-sm">Loading directory...</p></CardContent></Card>
-      ) : items.length === 0 ? (
-        <Card className="glass-card-dark border-emerald-400/30"><CardContent className="py-12 flex flex-col items-center gap-3"><Search className="w-8 h-8 text-emerald-300/60" /><p className="text-emerald-200/70 text-sm">No entries yet. Be the first to submit!</p></CardContent></Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {items.map((item) => (
-            <Card key={item.id} className="glass-card-dark border-emerald-400/30 hover:border-emerald-400/50 transition-colors">
-              <CardContent className="pt-5 space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-emerald-200 font-semibold hover:text-emerald-100">
-                      <span className="truncate">{item.name}</span>
-                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                    </a>
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      <Badge variant="outline" className="border-emerald-400/40 text-emerald-200 text-[10px]">{item.category}</Badge>
-                      <Badge variant="outline" className="border-teal-400/40 text-teal-200 text-[10px]">{item.pricing}</Badge>
-                    </div>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={voting === item.id}
-                    onClick={() => upvote(item.id)}
-                    className="border-emerald-400/30 text-emerald-200 hover:bg-emerald-500/10 flex-shrink-0"
-                  >
-                    {voting === item.id ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <ThumbsUp className="w-3 h-3 mr-1" />}
-                    {item.upvotes || 0}
-                  </Button>
-                </div>
-                {item.description && <p className="text-emerald-100/70 text-xs leading-relaxed">{item.description}</p>}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+          </CardContent>
+        </Card>
       )}
+      {result && (
+        <Card className="glass-card-dark border-emerald-400/30 mt-3">
+          <CardContent className="pt-4">
+            <div className="flex items-center justify-end mb-2"><Button size="sm" variant="ghost" onClick={() => copy(result)} className="text-purple-200/60 text-xs">{copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}</Button></div>
+            <div className="text-purple-50/90 text-sm"><ReactMarkdown>{result}</ReactMarkdown></div>
+          </CardContent>
+        </Card>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {items.length === 0 ? <div className="col-span-full text-center py-12 text-purple-200/60 text-sm">No prompts yet. Generate one!</div>
+        : items.map(item => (
+          <Card key={item.id} className="glass-card-dark border-emerald-400/20 hover:border-emerald-400/50">
+            <CardContent className="pt-4 pb-3">
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="text-sm font-semibold text-emerald-200">{item.title}</h3>
+                <Badge variant="outline" className="text-[9px] border-emerald-400/40 text-emerald-300">{item.model}</Badge>
+              </div>
+              <pre className="bg-black/40 border border-emerald-400/20 p-2 rounded text-[10px] text-emerald-300 max-h-32 overflow-y-auto">{item.promptText?.slice(0, 300)}{item.promptText?.length > 300 ? '...' : ''}</pre>
+              <div className="flex items-center justify-between mt-2">
+                <Badge variant="outline" className="text-[9px] border-purple-400/40 text-purple-300">{item.category}</Badge>
+                <button onClick={() => copy(item.promptText)} className="text-[10px] text-purple-200/60 hover:text-emerald-300"><Copy className="w-3 h-3" /></button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

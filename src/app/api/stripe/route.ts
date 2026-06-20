@@ -21,22 +21,22 @@ export const PLANS = {
   free: {
     name: 'Free',
     price: 0,
-    dailyLimit: 3,
-    features: ['3 AI generations per day per product', 'Access to all 8 products'],
+    dailyLimit: 10, // 10 total uses (not per day — lifetime)
+    features: ['10 total generations', 'All 7 products accessible'],
     stripePriceId: null,
   },
   module: {
-    name: 'Single Module',
-    price: 9,
+    name: 'Single Product',
+    price: 4.99,
     dailyLimit: Infinity,
-    features: ['Unlimited access to ONE product', 'Full feature unlock', 'History & favorites', 'No ads'],
+    features: ['Unlimited in ONE product', 'Full feature unlock', 'History & favorites', 'No ads'],
     stripePriceId: process.env.STRIPE_MODULE_PRICE_ID || 'price_module_monthly',
   },
   allaccess: {
     name: 'All-Access',
-    price: 39,
+    price: 14.99,
     dailyLimit: Infinity,
-    features: ['Unlimited access to ALL 8 products', 'Commercial license', 'API access', 'Priority support', 'White-label option'],
+    features: ['Unlimited ALL 7 products', 'Commercial license', 'Priority support', 'Early access'],
     stripePriceId: process.env.STRIPE_ALLACCESS_PRICE_ID || 'price_allaccess_monthly',
   },
 } as const;

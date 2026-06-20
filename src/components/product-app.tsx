@@ -19,7 +19,6 @@ import { MemorialApp } from '@/components/apps/memorial-app';
 import { GenealogyApp } from '@/components/apps/genealogy-app';
 import { CaregiverApp } from '@/components/apps/caregiver-app';
 import { DirectoryApp } from '@/components/apps/directory-app';
-import { PromptsApp } from '@/components/apps/prompts-app';
 
 interface ProductAppProps {
   productId: ProductId;
@@ -50,7 +49,6 @@ export function ProductApp({ productId, onBack, aiProvider, aiFree }: ProductApp
       case 'genealogy': return <GenealogyApp />;
       case 'caregiver': return <CaregiverApp />;
       case 'directory': return <DirectoryApp />;
-      case 'prompts': return <PromptsApp />;
       default: return null;
     }
   };

@@ -19,7 +19,7 @@ import { AdminDashboard } from '@/components/admin-dashboard';
 
 export type ProductId =
   | 'mystic' | 'storybook' | 'dream' | 'memorial'
-  | 'genealogy' | 'caregiver' | 'directory' | 'prompts';
+  | 'genealogy' | 'caregiver' | 'directory';
 
 type View = { type: 'constellation' } | { type: 'product'; id: ProductId } | { type: 'account' } | { type: 'admin' };
 

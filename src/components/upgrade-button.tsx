@@ -14,17 +14,17 @@ const PLANS = {
   free: {
     name: 'Free',
     price: 0,
-    features: ['3 AI generations / day / product', 'All 8 products accessible'],
+    features: ['10 total generations', 'All 7 products accessible'],
   },
   module: {
-    name: 'Single Module',
-    price: 9,
+    name: 'Single Product',
+    price: 4.99,
     features: ['Unlimited in ONE product', 'Full feature unlock', 'History & favorites', 'No ads'],
   },
   allaccess: {
     name: 'All-Access',
-    price: 39,
-    features: ['Unlimited ALL 8 products', 'Commercial license', 'API access', 'Priority support', 'White-label'],
+    price: 14.99,
+    features: ['Unlimited ALL 7 products', 'Commercial license', 'Priority support', 'Early access'],
   },
 } as const;
 
