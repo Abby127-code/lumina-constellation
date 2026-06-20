@@ -6,18 +6,21 @@ import { LocaleProvider, useLocale } from '@/components/locale-provider';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { AccountButton } from '@/components/account-button';
 import { UpgradeButton } from '@/components/upgrade-button';
+import { NotificationBell } from '@/components/notification-bell';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Toaster } from '@/components/ui/toaster';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Moon, UserCircle, Cpu } from 'lucide-react';
+import { Sparkles, Moon, UserCircle, Cpu, Crown } from 'lucide-react';
 import { HomePage } from '@/components/tracks/home';
 import { MemorialTrack, CaregiverTrack, GenealogyTrack, MicrosaasTrack } from '@/components/tracks/new-tracks';
 import { MysticTrack, StorybookTrack, DirectoryTrack, PromptsTrack } from '@/components/tracks/legacy-tracks';
 import { AccountPage } from '@/components/account-page';
 import { AgentTrack } from '@/components/tracks/agent-track';
 import { TiktokTrack } from '@/components/tracks/tiktok-track';
+import { AdminDashboard } from '@/components/admin-dashboard';
 
-type Track = 'home' | 'mystic' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'agent' | 'tiktok' | 'account';
+type Track = 'home' | 'mystic' | 'storybook' | 'directory' | 'prompts' | 'memorial' | 'caregiver' | 'genealogy' | 'microsaas' | 'agent' | 'tiktok' | 'account' | 'admin';
 
 export default function Home() {
   return (
@@ -49,6 +52,24 @@ function App() {
       setAiFree(data.isFree !== false);
     }).catch(() => {});
   }, []);
+
+  // 自动应用推荐码（URL ?ref=xxx）
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref && user?.userId) {
+      fetch('/api/engage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'apply-referral', userId: user.userId, code: ref }),
+      }).then((r) => r.json()).then((data) => {
+        if (data.success) {
+          // 推荐码应用成功，清理 URL
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      }).catch(() => {});
+    }
+  }, [user?.userId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -143,6 +164,7 @@ function App() {
         {activeTrack === 'agent' && <AgentTrack />}
         {activeTrack === 'tiktok' && <TiktokTrack />}
         {activeTrack === 'account' && <AccountPage />}
+        {activeTrack === 'admin' && <AdminDashboard />}
         <Footer aiProvider={aiProvider} aiFree={aiFree} />
       </div>
       <Toaster />
@@ -183,8 +205,10 @@ function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (
             <p className="text-purple-200/60 text-xs tracking-wider">{tr('app.tagline')}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <LanguageSwitcher />
+          <ThemeToggle />
+          {user?.isAuthed && <NotificationBell />}
           <AccountButton />
           <UpgradeButton />
           {user?.isAuthed && (
@@ -195,6 +219,17 @@ function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (
               className={`text-purple-200/80 hover:text-gold hover:bg-gold/10 text-xs ${activeTrack === 'account' ? 'text-gold bg-gold/10' : ''}`}
             >
               <UserCircle className="w-3.5 h-3.5" />
+            </Button>
+          )}
+          {user?.isAuthed && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onNavigate('admin')}
+              className={`text-purple-200/60 hover:text-amber-300 hover:bg-amber-500/10 text-xs ${activeTrack === 'admin' ? 'text-amber-300 bg-amber-500/10' : ''}`}
+              title="后台仪表盘"
+            >
+              <Crown className="w-3.5 h-3.5" />
             </Button>
           )}
         </div>

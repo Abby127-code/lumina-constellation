@@ -428,6 +428,14 @@ ${cardsDescription}
             where: { id: userId },
             data: { totalReadings: { increment: 1 } },
           });
+          // 自动记录 streak + 解锁成就
+          try {
+            await fetch('/api/engage', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'record-activity', userId, activityType: 'reading' }),
+            });
+          } catch {}
         }
       } catch (dbErr) {
         console.error('DB save error:', dbErr);
