@@ -203,6 +203,30 @@ ${cardsDescription}
         break;
       }
 
+      case 'caregiver': {
+        systemPrompt = PROMPTS.caregiver;
+        userPrompt = `请为以下照护场景提供支持：
+- 照护对象：${input.careRecipient || '长辈'}
+- 状况类型：${input.careType || '一般咨询'}
+- 描述：${input.description}
+- 照护者当前情绪：${input.mood || '未指定'}
+- 已尝试的措施：${input.triedAlready || '未提供'}`;
+        result = await callAI(systemPrompt, userPrompt, { maxTokens: 2400 });
+        break;
+      }
+
+      case 'microsaas': {
+        systemPrompt = PROMPTS.microsaas;
+        userPrompt = `请为以下方向生成微 SaaS 创意：
+- 兴趣领域：${input.field || '通用'}
+- 技术能力：${input.techStack || 'Next.js + API'}
+- 目标 MRR：${input.targetMrr || '$1K-10K'}
+- 偏好类型：${input.category || 'chrome-ext/notion-plugin/slack-bot/zapier/shopify-app'}
+- 其他要求：${input.notes || '无'}`;
+        result = await callAI(systemPrompt, userPrompt, { maxTokens: 3000, temperature: 0.9 });
+        break;
+      }
+
       default:
         return NextResponse.json({ error: 'Unknown module: ' + module }, { status: 400 });
     }
@@ -267,6 +291,18 @@ ${cardsDescription}
               model: input.model || 'ChatGPT',
               promptText: result,
               description: input.scene || null,
+            },
+          });
+        } else if (module === 'caregiver') {
+          savedRecord = await db.caregiverLog.create({
+            data: {
+              userId,
+              logDate: new Date(),
+              careType: input.careType || 'general',
+              title: input.careType || '照护咨询',
+              content: input.description || '',
+              aiAdvice: result,
+              mood: input.mood || null,
             },
           });
         } else {
