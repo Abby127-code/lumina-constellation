@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Cover</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0A2540;
+    --accent: #E8B14F;
+    --signal: #4A90E2;
+    --bg: #FAFBFC;
+    --muted: #5A6B7E;
+    --border: #D0D4D8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  @page { size: 794px 1123px; margin: 0; }
+  html, body {
+    width: 794px;
+    height: 1123px;
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    font-family: 'Noto Serif SC', 'Noto Sans SC', serif;
+    color: var(--primary);
+    overflow: hidden;
+  }
+  .cover-page {
+    position: relative;
+    width: 794px;
+    height: 1123px;
+    background: var(--bg);
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Layer 1: Background grid (very subtle) */
+  .layer-1 {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    background-image:
+      linear-gradient(to right, rgba(10,37,64,0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(10,37,64,0.025) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Layer 2: Structure - vertical anchor line */
+  .layer-2 {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+  .anchor-line {
+    position: absolute;
+    left: 95px;
+    top: 112px;
+    width: 6px;
+    height: 899px;
+    background: var(--primary);
+  }
+  /* Top corner mark */
+  .top-mark {
+    position: absolute;
+    top: 100px;
+    right: 70px;
+    width: 80px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .top-mark-label {
+    position: absolute;
+    top: 40px;
+    right: 70px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  /* Bottom corner mark - placed away from footer */
+  .bottom-mark {
+    position: absolute;
+    bottom: 130px;
+    left: 130px;
+    width: 60px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  /* Layer 3: Content */
+  .layer-3 {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+  }
+
+  /* Drawer A - Kicker */
+  .kicker {
+    position: absolute;
+    top: 168px;
+    left: 155px;
+    right: 70px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+  .kicker .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    margin-right: 12px;
+    vertical-align: middle;
+  }
+
+  /* Drawer B - Hero Title */
+  .hero-title {
+    position: absolute;
+    top: 240px;
+    left: 155px;
+    right: 70px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 54px;
+    font-weight: 900;
+    line-height: 1.18;
+    color: var(--primary);
+    letter-spacing: -1px;
+  }
+  .hero-title .accent-bar {
+    display: block;
+    width: 56px;
+    height: 8px;
+    background: var(--accent);
+    margin-bottom: 24px;
+  }
+  .hero-title .line1 { display: block; }
+  .hero-title .line2 { display: block; color: var(--signal); }
+  .hero-title .line3 { display: block; }
+
+  /* Drawer C - Summary */
+  .summary {
+    position: absolute;
+    top: 560px;
+    left: 155px;
+    right: 70px;
+    width: 530px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 14.5px;
+    font-weight: 400;
+    line-height: 1.75;
+    color: var(--primary);
+    opacity: 0.85;
+  }
+  .summary .lead {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary);
+    margin-bottom: 12px;
+    line-height: 1.6;
+    opacity: 1;
+  }
+
+  /* Stat badges */
+  .stat-badges {
+    position: absolute;
+    top: 760px;
+    left: 155px;
+    right: 70px;
+    display: flex;
+    gap: 36px;
+  }
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 14px;
+    border-left: 2px solid var(--accent);
+  }
+  .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* Meta block */
+  .meta-block {
+    position: absolute;
+    top: 880px;
+    left: 155px;
+    right: 70px;
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+  }
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .meta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .meta-value {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--primary);
+  }
+
+  /* Footer */
+  .footer {
+    position: absolute;
+    bottom: 50px;
+    left: 155px;
+    right: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .footer .right {
+    color: var(--primary);
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+<div class="cover-page">
+
+  <div class="layer-1"></div>
+
+  <div class="layer-2">
+    <div class="anchor-line"></div>
+    <div class="top-mark"></div>
+    <div class="top-mark-label">VOL.01 · BLUE OCEAN</div>
+    <div class="bottom-mark"></div>
+  </div>
+
+  <div class="layer-3">
+
+    <div class="kicker">
+      <span class="dot"></span>BLUE OCEAN OPPORTUNITY RESEARCH · 2025-2026
+    </div>
+
+    <div class="hero-title">
+      <span class="accent-bar"></span>
+      <span class="line1">海外数字产品</span>
+      <span class="line2">蓝海创业机会</span>
+      <span class="line3">深度研究报告</span>
+    </div>
+
+    <div class="summary">
+      <div class="lead">面向 5 万预算 · 兼职副业 · AI 赋能的轻量级出海项目创业者</div>
+      <div>
+        基于 24 个赛道方向、240 条实时市场数据深度扫描，覆盖 AI 原生应用、情绪经济、银发养老、宠物科技、出海工具站五大热门方向。从蓝海度、利润率、竞争度、轻量度、ROI、售后成本、创新性、可兼职性 8 大维度评分，筛选最匹配个人创业者的 TOP1 推荐赛道，并给出 90 天落地路线图与 ROI 测算。
+      </div>
+    </div>
+
+    <div class="stat-badges">
+      <div class="stat-item">
+        <div class="stat-value">24</div>
+        <div class="stat-label">赛道扫描</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">240+</div>
+        <div class="stat-label">数据样本</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">8</div>
+        <div class="stat-label">候选赛道</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">1</div>
+        <div class="stat-label">最优推荐</div>
+      </div>
+    </div>
+
+    <div class="meta-block">
+      <div class="meta-item">
+        <div class="meta-label">PREPARED FOR</div>
+        <div class="meta-value">独立创业者 / Solo Founder</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">RESEARCH SCOPE</div>
+        <div class="meta-value">Global Digital Product Market</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">RELEASE</div>
+        <div class="meta-value">2026 · Q2 Edition</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Z.AI · STRATEGY RESEARCH UNIT</span>
+      <span class="right">CONFIDENTIAL · INTERNAL USE</span>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
