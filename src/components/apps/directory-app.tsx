@@ -169,7 +169,7 @@ function PromptsTab() {
     } catch {}
   }, [category]);
 
-  useEffect(() => { loadPrompts(); }, [loadPrompts]);
+  useEffect(() => { const t = setTimeout(() => loadPrompts(), 0); return () => clearTimeout(t); }, [loadPrompts]);
 
   const cats = [
     { id: 'all', name: 'All' }, { id: 'writing', name: 'Writing' }, { id: 'image', name: 'Image' },

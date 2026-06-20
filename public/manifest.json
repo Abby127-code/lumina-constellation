@@ -1,7 +1,7 @@
 {
-  "name": "Lumina Constellation · Eight Stars · One Sky",
+  "name": "Lumina Constellation · 7 Independent Products",
   "short_name": "Lumina ✦",
-  "description": "Eight independent AI products. Each a standalone brand, each installable as an app. AI Spiritual Companion · Kids Storybook · Dream Interpretation · Digital Memorial · Genealogy · Caregiver · AI Directory · Prompt Library",
+  "description": "Seven standalone products. Seven unique experiences. Spiritual Companion · Storybook Studio · Dream Journal · Memorial · Family Atlas · AI Caregiver · AI Toolkit",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0A0F1F",
@@ -25,43 +25,38 @@
   ],
   "shortcuts": [
     {
-      "name": "✦ Vega · Spiritual Companion",
+      "name": "Lumina Spiritual",
       "url": "/?product=mystic",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "★ Andromeda · Kids Storybook",
+      "name": "Storybook Studio",
       "url": "/?product=storybook",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "🌙 Selene · Dream Interpretation",
+      "name": "Dream Journal",
       "url": "/?product=dream",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "✧ Pleiades · Digital Memorial",
+      "name": "Memorial",
       "url": "/?product=memorial",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "✦ Cassiopeia · Genealogy",
+      "name": "Family Atlas",
       "url": "/?product=genealogy",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "★ Lyra · Caregiver Support",
+      "name": "AI Caregiver Support",
       "url": "/?product=caregiver",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "✧ Polaris · AI Directory",
+      "name": "AI Toolkit",
       "url": "/?product=directory",
-      "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
-    },
-    {
-      "name": "☿ Mercury · Prompt Library",
-      "url": "/?product=prompts",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     }
   ]

@@ -199,9 +199,9 @@ export function ConstellationHome({ onLaunchProduct }: { onLaunchProduct: (id: P
       {/* Pricing Hint */}
       <section className="glass-card-dark border-gold/20 rounded-xl p-4 text-center">
         <p className="text-purple-200/70 text-xs">
-          <span className="text-emerald-300 font-semibold">Free</span> 10 uses total ·{' '}
-          <span className="text-sky-300 font-semibold">$4.99/mo</span> single product ·{' '}
-          <span className="text-amber-300 font-semibold">$14.99/mo</span> all-access pass
+          <span className="text-emerald-300 font-semibold">Free</span> 3 trial uses ·{' '}
+          <span className="text-sky-300 font-semibold">$4.99/mo</span> per product ·{' '}
+          <span className="text-amber-300 font-semibold">$47.90/yr</span> (save 20%)
         </p>
       </section>
 
