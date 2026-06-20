@@ -192,17 +192,18 @@ function Header({ activeTrack, onNavigate }: { activeTrack: Track; onNavigate: (
     <header className="mb-6 sm:mb-10">
       <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => onNavigate('home')}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-purple-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-purple-600 flex items-center justify-center relative">
             <Sparkles className="w-5 h-5 text-white" />
+            <span className="absolute -top-1 -right-1 text-xs text-amber-300">✦</span>
           </div>
           <div>
             <h1
               className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300"
               style={{ fontFamily: 'var(--font-cormorant), serif', letterSpacing: '0.02em' }}
             >
-              Lumina Studio
+              Lumina Constellation
             </h1>
-            <p className="text-purple-200/60 text-xs tracking-wider">{tr('app.tagline')}</p>
+            <p className="text-purple-200/60 text-xs tracking-wider">✦ Eight Stars · One Sky · 八颗星，一片天空 ✦</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -257,18 +258,18 @@ function Footer({ aiProvider, aiFree }: { aiProvider?: string; aiFree?: boolean 
   return (
     <footer className="mt-12 pt-6 border-t border-gold/20 text-center">
       <div className="flex items-center justify-center gap-2 text-purple-200/60 text-xs flex-wrap">
-        <Sparkles className="w-3 h-3 text-gold" />
-        <span>Lumina Studio · AI 原生蓝海产品矩阵 · 7 种语言 · PWA</span>
+        <span className="text-amber-300">✦</span>
+        <span>Lumina Constellation · Eight Stars · One Sky</span>
         {aiProvider && (
           <Badge variant="outline" className={`text-[9px] ml-1 ${aiFree ? 'border-emerald-400/40 text-emerald-300' : 'border-amber-400/40 text-amber-300'}`}>
             <Cpu className="w-2.5 h-2.5 mr-1" /> {aiProvider}
-            {aiFree && <span className="ml-1">· 免费</span>}
+            {aiFree && <span className="ml-1">· Free</span>}
           </Badge>
         )}
-        <Sparkles className="w-3 h-3 text-gold" />
+        <span className="text-amber-300">✦</span>
       </div>
       <p className="text-purple-300/40 text-xs mt-2 max-w-md mx-auto leading-relaxed">
-        本产品提供的所有内容仅供娱乐与灵性探索参考，不构成医疗、心理、法律或投资建议。
+        ✦ Vega · ★ Andromeda · ✧ Polaris · ✦ Sirius · ✧ Pleiades · ★ Lyra · ✦ Cassiopeia · ✧ Orion ✦
       </p>
     </footer>
   );

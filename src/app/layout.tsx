@@ -20,16 +20,17 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Lumina Studio · 8 Blue Ocean Tracks · AI-Native Product Matrix",
-  description: "AI-native blue ocean product matrix — Spiritual Companion · Kids Storybook · AI Directory · Prompt Library · Digital Memorial · Caregiver · Genealogy · Micro SaaS. 7 languages supported. PWA installable.",
+  title: "Lumina Constellation · Eight Stars · One Sky · AI-Native Product Matrix",
+  description: "Eight stars guiding every dimension of your life. AI Spiritual Companion (Vega) · Kids Storybook (Andromeda) · AI Directory (Polaris) · Prompt Library (Sirius) · Digital Memorial (Pleiades) · Caregiver (Lyra) · Genealogy (Cassiopeia) · Micro SaaS (Orion). 7 languages. PWA installable.",
   keywords: [
     "AI astrology", "tarot reading", "dream interpretation", "numerology", "Bazi",
     "AI kids storybook", "AI directory", "AI prompts", "digital memorial",
     "caregiver support", "genealogy", "Micro SaaS",
-    "Lumina Studio", "blue ocean startup", "AI products",
+    "Lumina Constellation", "constellation", "eight stars",
+    "Vega", "Andromeda", "Polaris", "Sirius", "Pleiades", "Lyra", "Cassiopeia", "Orion",
     "AI占星", "塔罗占卜", "解梦", "AI儿童故事书", "AI目录站",
   ],
-  authors: [{ name: "Lumina Studio" }],
+  authors: [{ name: "Lumina Constellation" }],
   manifest: "/manifest.json",
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
@@ -38,22 +39,22 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Lumina Studio",
+    title: "Lumina Constellation",
   },
-  applicationName: "Lumina Studio",
+  applicationName: "Lumina Constellation",
   formatDetection: { telephone: false },
   openGraph: {
-    title: "Lumina Studio · 8 Blue Ocean Tracks AI-Native Product Matrix",
-    description: "One platform, eight blue oceans. AI Spiritual Companion · Kids Storybook · AI Directory · Prompt Library · Digital Memorial · Caregiver · Genealogy · Micro SaaS",
-    siteName: "Lumina Studio",
+    title: "Lumina Constellation · Eight Stars · One Sky",
+    description: "Eight stars guiding every dimension of your life. AI Spiritual Companion · Kids Storybook · AI Directory · Prompt Library · Digital Memorial · Caregiver · Genealogy · Micro SaaS",
+    siteName: "Lumina Constellation",
     type: "website",
     locale: "en_US",
     alternateLocale: ["zh_CN", "es_ES", "pt_BR", "ja_JP", "hi_IN", "ar_SA"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lumina Studio",
-    description: "AI-native blue ocean product matrix · 8 tracks · 7 languages · PWA",
+    title: "Lumina Constellation",
+    description: "Eight stars. One sky. Your story written in light. · 8 AI products · 7 languages · PWA",
   },
   alternates: {
     canonical: "/",
@@ -105,9 +106,10 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              name: "Lumina Studio",
+              name: "Lumina Constellation",
               applicationCategory: "LifestyleApplication",
               operatingSystem: "Web, iOS, Android",
+              description: "Eight stars guiding every dimension of your life. AI-native product constellation.",
               offers: {
                 "@type": "Offer",
                 price: "0",

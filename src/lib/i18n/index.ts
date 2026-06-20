@@ -18,9 +18,9 @@ export const LOCALES: { code: Locale; name: string; flag: string; dir: 'ltr' | '
 type Dict = Record<string, string>;
 
 const zh: Dict = {
-  'app.name': 'Lumina Studio',
-  'app.tagline': '8 大蓝海赛道 · AI 原生产品矩阵',
-  'app.cta': '一个平台，八个蓝海',
+  'app.name': 'Lumina Constellation',
+  'app.tagline': 'Eight Stars · One Sky · 八颗星，一片天空',
+  'app.cta': '八颗星指引你生活的每个维度',
   'nav.home': '首页',
   'nav.mystic': '灵性陪伴',
   'nav.storybook': '儿童故事书',
@@ -70,9 +70,9 @@ const zh: Dict = {
 };
 
 const en: Dict = {
-  'app.name': 'Lumina Studio',
-  'app.tagline': '8 Blue Ocean Tracks · AI-Native Product Matrix',
-  'app.cta': 'One Platform, Eight Blue Oceans',
+  'app.name': 'Lumina Constellation',
+  'app.tagline': 'Eight Stars · One Sky · Your story written in light',
+  'app.cta': 'Eight stars guiding every dimension of your life',
   'nav.home': 'Home',
   'nav.mystic': 'Spiritual',
   'nav.storybook': "Kids' Books",
@@ -122,9 +122,9 @@ const en: Dict = {
 };
 
 const es: Dict = {
-  'app.name': 'Lumina Studio',
-  'app.tagline': '8 Océanos Azules · Matriz de Productos IA',
-  'app.cta': 'Una Plataforma, Ocho Océanos Azules',
+  'app.name': 'Lumina Constellation',
+  'app.tagline': 'Ocho Estrellas · Un Cielo · Tu historia escrita en luz',
+  'app.cta': 'Ocho estrellas guían cada dimensión de tu vida',
   'nav.home': 'Inicio',
   'nav.mystic': 'Espiritual',
   'nav.storybook': 'Libros Infantiles',
@@ -175,8 +175,8 @@ const es: Dict = {
 
 const pt: Dict = {
   ...en,
-  'app.tagline': '8 Oceanos Azuis · Matriz de Produtos IA',
-  'app.cta': 'Uma Plataforma, Oito Oceanos Azuis',
+  'app.tagline': 'Oito Estrelas · Um Céu · Sua história escrita em luz',
+  'app.cta': 'Oito estrelas guiando cada dimensão da sua vida',
   'nav.home': 'Início',
   'nav.mystic': 'Espiritual',
   'nav.storybook': 'Livros Infantis',
@@ -215,8 +215,8 @@ const pt: Dict = {
 
 const ja: Dict = {
   ...en,
-  'app.tagline': '8つのブルーオーシャン · AIネイティブ製品群',
-  'app.cta': '一つのプラットフォーム、八つのブルーオーシャン',
+  'app.tagline': '八つの星 · 一つの空 · 光で綴るあなたの物語',
+  'app.cta': '八つの星があなたの人生のあらゆる側面を導く',
   'nav.home': 'ホーム',
   'nav.mystic': 'スピリチュアル',
   'nav.storybook': '絵本',
@@ -255,8 +255,8 @@ const ja: Dict = {
 
 const hi: Dict = {
   ...en,
-  'app.tagline': '8 ब्लू ओशन ट्रैक्स · AI-नेटिव उत्पाद मैट्रिक्स',
-  'app.cta': 'एक प्लेटफ़ॉर्म, आठ ब्लू ओशन',
+  'app.tagline': 'आठ सितारे · एक आसमान · रोशनी में लिखी आपकी कहानी',
+  'app.cta': 'आठ सितारे आपके जीवन के हर पहलू का मार्गदर्शन करते हैं',
   'nav.home': 'होम',
   'nav.mystic': 'आध्यात्मिक',
   'nav.storybook': 'बच्चों की किताबें',
@@ -295,8 +295,8 @@ const hi: Dict = {
 
 const ar: Dict = {
   ...en,
-  'app.tagline': '8 مسارات المحيط الأزرق · مصفوعة منتجات AI',
-  'app.cta': 'منصة واحدة، ثمانية محيطات زرقاء',
+  'app.tagline': 'ثمانية نجوم · سماء واحدة · قصتك مكتوبة بالنور',
+  'app.cta': 'ثمانية نجوم ترشد كل بُعد في حياتك',
   'nav.home': 'الرئيسية',
   'nav.mystic': 'روحاني',
   'nav.storybook': 'كتب الأطفال',

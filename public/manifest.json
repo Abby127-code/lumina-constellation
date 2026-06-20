@@ -1,7 +1,7 @@
 {
-  "name": "Lumina Studio · 8 Blue Ocean Tracks",
-  "short_name": "Lumina",
-  "description": "AI-native blue ocean product matrix - Spiritual Companion · Kids Storybook · AI Directory · Prompt Library",
+  "name": "Lumina Constellation · Eight Stars · One Sky",
+  "short_name": "Lumina ✦",
+  "description": "Eight stars guiding every dimension of your life. AI Spiritual Companion · Kids Storybook · AI Directory · Prompt Library · Digital Memorial · Caregiver · Genealogy · Micro SaaS",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0A0F1F",
@@ -25,22 +25,22 @@
   ],
   "shortcuts": [
     {
-      "name": "灵性陪伴",
+      "name": "✦ Vega · Spiritual",
       "url": "/?track=mystic",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "儿童故事书",
+      "name": "★ Andromeda · Kids Books",
       "url": "/?track=storybook",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "AI 目录站",
+      "name": "✧ Polaris · AI Directory",
       "url": "/?track=directory",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     },
     {
-      "name": "Prompt 库",
+      "name": "✦ Sirius · Prompt Library",
       "url": "/?track=prompts",
       "icons": [{"src": "https://z-cdn.chatglm.cn/z-ai/static/logo.svg", "sizes": "96x96"}]
     }
