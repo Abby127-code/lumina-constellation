@@ -8,7 +8,7 @@ import { NotificationBell } from '@/components/notification-bell';
 import { AccountButton } from '@/components/account-button';
 import { UpgradeButton } from '@/components/upgrade-button';
 import { Toaster } from '@/components/ui/toaster';
-import { ArrowLeft, Sparkles, Cpu, Moon } from 'lucide-react';
+import { ArrowLeft, Cpu } from 'lucide-react';
 import { useSession } from '@/lib/session';
 import type { ProductId } from '@/app/page';
 import { PRODUCTS } from '@/components/constellation-home';
@@ -20,6 +20,17 @@ import { GenealogyApp } from '@/components/apps/genealogy-app';
 import { CaregiverApp } from '@/components/apps/caregiver-app';
 import { DirectoryApp } from '@/components/apps/directory-app';
 
+// Map product ID to theme class
+const THEME_MAP: Record<ProductId, string> = {
+  mystic: 'theme-mystic',
+  storybook: 'theme-storybook',
+  dream: 'theme-dream',
+  memorial: 'theme-memorial',
+  genealogy: 'theme-genealogy',
+  caregiver: 'theme-caregiver',
+  directory: 'theme-directory',
+};
+
 interface ProductAppProps {
   productId: ProductId;
   onBack: () => void;
@@ -30,6 +41,7 @@ interface ProductAppProps {
 export function ProductApp({ productId, onBack, aiProvider, aiFree }: ProductAppProps) {
   const { user } = useSession();
   const product = PRODUCTS.find((p) => p.id === productId);
+  const themeClass = THEME_MAP[productId] || 'theme-mystic';
 
   if (!product) {
     return (
@@ -54,36 +66,24 @@ export function ProductApp({ productId, onBack, aiProvider, aiFree }: ProductApp
   };
 
   return (
-    <div className="min-h-screen bg-mystic-gradient relative overflow-hidden flex flex-col">
-      <div className="absolute inset-0 starfield opacity-20 pointer-events-none" />
-
+    <div className={`product-app-root ${themeClass} relative overflow-hidden flex flex-col`}>
       {/* Independent Product Header */}
-      <header className="relative z-10 border-b border-gold/20 bg-night/60 backdrop-blur-md sticky top-0">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+      <header className="relative z-10 border-b border-[var(--p-border)] bg-black/20 backdrop-blur-md sticky top-0">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            {/* Back to Constellation */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onBack}
-              className="text-purple-200/70 hover:text-gold hover:bg-gold/10 text-xs shrink-0"
-            >
+            <Button variant="ghost" size="sm" onClick={onBack} className="product-app-muted hover:product-app-accent text-xs shrink-0">
               <ArrowLeft className="w-4 h-4 mr-1" /> Sky
             </Button>
-            <div className="w-px h-6 bg-gold/20" />
-            {/* Product Brand */}
+            <div className="w-px h-6 bg-[var(--p-border)]" />
             <div className="flex items-center gap-2">
-              <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${product.color} border ${product.border} flex items-center justify-center text-gold relative shrink-0`}>
+              <div className="w-9 h-9 rounded-lg bg-[var(--p-card)] border border-[var(--p-border)] flex items-center justify-center product-app-accent shrink-0">
                 {product.icon}
-                <span className="absolute -top-1 -right-1 text-xs">{product.starSymbol}</span>
               </div>
               <div className="min-w-0">
-                <h1 className="text-sm sm:text-base font-bold text-gold truncate" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+                <h1 className="text-sm sm:text-base font-bold product-app-header truncate" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
                   {product.name}
                 </h1>
-                <p className="text-purple-300/50 text-[10px] hidden sm:block">
-                  {product.starSymbol} {product.star} · {product.starMeaning}
-                </p>
+                <p className="product-app-muted text-[10px] hidden sm:block">{product.tagline}</p>
               </div>
             </div>
           </div>
@@ -103,16 +103,14 @@ export function ProductApp({ productId, onBack, aiProvider, aiFree }: ProductApp
       </div>
 
       {/* Product Footer */}
-      <footer className="relative z-10 mt-8 pt-4 border-t border-gold/20 text-center">
-        <div className="flex items-center justify-center gap-2 text-purple-200/50 text-[10px] flex-wrap">
-          <span className="text-amber-300/60">{product.starSymbol}</span>
+      <footer className="relative z-10 mt-8 pt-4 border-t border-[var(--p-border)] text-center">
+        <div className="flex items-center justify-center gap-2 product-app-muted text-[10px] flex-wrap">
           <span>{product.name} · Part of Lumina Constellation</span>
           {aiProvider && (
             <Badge variant="outline" className={`text-[8px] ${aiFree ? 'border-emerald-400/30 text-emerald-300/70' : 'border-amber-400/30 text-amber-300/70'}`}>
               <Cpu className="w-2 h-2 mr-0.5" /> {aiProvider}{aiFree && ' · Free'}
             </Badge>
           )}
-          <span className="text-amber-300/60">{product.starSymbol}</span>
         </div>
       </footer>
       <Toaster />

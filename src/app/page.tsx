@@ -16,6 +16,7 @@ import { ConstellationHome } from '@/components/constellation-home';
 import { ProductApp } from '@/components/product-app';
 import { AccountPage } from '@/components/account-page';
 import { AdminDashboard } from '@/components/admin-dashboard';
+import { InstallPrompt } from '@/components/install-prompt';
 
 export type ProductId =
   | 'mystic' | 'storybook' | 'dream' | 'memorial'
@@ -145,12 +146,15 @@ function App() {
   // ─── Product App Mode (full-screen takeover) ───
   if (view.type === 'product') {
     return (
-      <ProductApp
-        productId={view.id}
-        onBack={() => setView({ type: 'constellation' })}
-        aiProvider={aiProvider}
-        aiFree={aiFree}
-      />
+      <>
+        <ProductApp
+          productId={view.id}
+          onBack={() => setView({ type: 'constellation' })}
+          aiProvider={aiProvider}
+          aiFree={aiFree}
+        />
+        <InstallPrompt />
+      </>
     );
   }
 
@@ -199,6 +203,7 @@ function App() {
         <Footer aiProvider={aiProvider} aiFree={aiFree} />
       </div>
       <Toaster />
+      <InstallPrompt />
     </div>
   );
 }

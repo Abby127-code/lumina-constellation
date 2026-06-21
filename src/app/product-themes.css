@@ -1,0 +1,134 @@
+/* Lumina Constellation — 7 Independent Product Themes */
+
+/* ── 1. Lumina Spiritual — Mystical Luxury (deep purple + gold) ── */
+.theme-mystic {
+  --p-bg: radial-gradient(ellipse at top, #2d1b4e 0%, #0f0a1f 70%);
+  --p-card: rgba(88, 28, 135, 0.25);
+  --p-border: rgba(251, 191, 36, 0.3);
+  --p-accent: #fbbf24;
+  --p-header: #fde68a;
+  --p-button: linear-gradient(to right, #f59e0b, #d97706);
+  --p-text: #f3e8ff;
+  --p-muted: rgba(196, 181, 253, 0.6);
+}
+
+/* ── 2. Storybook Studio — Warm Playful (rose + cream) ── */
+.theme-storybook {
+  --p-bg: radial-gradient(ellipse at top, #fff1f2 0%, #fef3c7 100%);
+  --p-card: rgba(255, 255, 255, 0.85);
+  --p-border: rgba(244, 114, 182, 0.4);
+  --p-accent: #e11d48;
+  --p-header: #be123c;
+  --p-button: linear-gradient(to right, #fb7185, #f97316);
+  --p-text: #4c0519;
+  --p-muted: rgba(190, 18, 60, 0.5);
+}
+
+/* ── 3. Dream Journal — Dreamy Soft (deep blue + lavender) ── */
+.theme-dream {
+  --p-bg: radial-gradient(ellipse at top, #1e1b4b 0%, #0c0a1e 70%);
+  --p-card: rgba(49, 46, 129, 0.25);
+  --p-border: rgba(129, 140, 248, 0.3);
+  --p-accent: #a5b4fc;
+  --p-header: #c7d2fe;
+  --p-button: linear-gradient(to right, #6366f1, #3b82f6);
+  --p-text: #e0e7ff;
+  --p-muted: rgba(165, 180, 252, 0.5);
+}
+
+/* ── 4. Memorial — Respectful Serene (muted purple + silver) ── */
+.theme-memorial {
+  --p-bg: radial-gradient(ellipse at top, #1c1917 0%, #0c0a09 70%);
+  --p-card: rgba(67, 56, 95, 0.2);
+  --p-border: rgba(196, 181, 253, 0.25);
+  --p-accent: #c4b5fd;
+  --p-header: #ddd6fe;
+  --p-button: linear-gradient(to right, #7c3aed, #4f46e5);
+  --p-text: #ede9fe;
+  --p-muted: rgba(196, 181, 253, 0.4);
+}
+
+/* ── 5. Family Atlas — Vintage Heritage (sepia + warm brown) ── */
+.theme-genealogy {
+  --p-bg: radial-gradient(ellipse at top, #44392c30 0%, #1c1410 70%);
+  --p-card: rgba(120, 53, 15, 0.15);
+  --p-border: rgba(217, 119, 6, 0.3);
+  --p-accent: #d97706;
+  --p-header: #fbbf24;
+  --p-button: linear-gradient(to right, #b45309, #92400e);
+  --p-text: #fef3c7;
+  --p-muted: rgba(217, 119, 6, 0.4);
+}
+
+/* ── 6. AI Caregiver Support — Warm Supportive (coral + cream) ── */
+.theme-caregiver {
+  --p-bg: radial-gradient(ellipse at top, #4c051d55 0%, #1c0a14 70%);
+  --p-card: rgba(190, 24, 93, 0.15);
+  --p-border: rgba(244, 114, 182, 0.3);
+  --p-accent: #f472b6;
+  --p-header: #fbcfe8;
+  --p-button: linear-gradient(to right, #ec4899, #e11d48);
+  --p-text: #fce7f3;
+  --p-muted: rgba(244, 114, 182, 0.4);
+}
+
+/* ── 7. AI Toolkit — Tech Modern (emerald + sky) ── */
+.theme-directory {
+  --p-bg: radial-gradient(ellipse at top, #064e3b50 0%, #0a0f0a 70%);
+  --p-card: rgba(5, 77, 56, 0.2);
+  --p-border: rgba(52, 211, 153, 0.3);
+  --p-accent: #34d399;
+  --p-header: #6ee7b7;
+  --p-button: linear-gradient(to right, #10b981, #0d9488);
+  --p-text: #d1fae5;
+  --p-muted: rgba(52, 211, 153, 0.4);
+}
+
+/* ── Shared product app styles ── */
+.product-app-root {
+  min-height: 100vh;
+  background: var(--p-bg);
+  color: var(--p-text);
+}
+
+.product-app-card {
+  background: var(--p-card);
+  border: 1px solid var(--p-border);
+  backdrop-filter: blur(12px);
+  border-radius: 0.75rem;
+}
+
+.product-app-header {
+  color: var(--p-header);
+}
+
+.product-app-accent {
+  color: var(--p-accent);
+}
+
+.product-app-muted {
+  color: var(--p-muted);
+}
+
+.product-app-button {
+  background: var(--p-button);
+  color: white;
+}
+
+.product-app-button-dark {
+  background: var(--p-button);
+  color: #1a1a1a;
+}
+
+/* Dark theme variants for input fields */
+.product-app-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--p-border);
+  color: var(--p-text);
+}
+
+.product-app-input-light {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--p-border);
+  color: var(--p-text);
+}
