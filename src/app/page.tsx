@@ -105,6 +105,20 @@ function App() {
           <p className="text-purple-300/40 text-xs mt-2">
             ✦ Spiritual · Storybook · Dream · Memorial · Family Atlas · Caregiver · Toolkit ✦
           </p>
+          {/* Legal links */}
+          <div className="flex items-center justify-center gap-3 mt-4 text-[10px] text-purple-300/40">
+            <a href="/privacy" className="hover:text-amber-300">Privacy</a>
+            <span>·</span>
+            <a href="/terms" className="hover:text-amber-300">Terms</a>
+            <span>·</span>
+            <a href="/disclaimer" className="hover:text-amber-300">Disclaimer</a>
+            <span>·</span>
+            <a href="/cookie-policy" className="hover:text-amber-300">Cookies</a>
+            <span>·</span>
+            <a href="/about" className="hover:text-amber-300">About</a>
+            <span>·</span>
+            <a href="/contact" className="hover:text-amber-300">Contact</a>
+          </div>
         </footer>
       </div>
       <Toaster />

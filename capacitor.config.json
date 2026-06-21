@@ -1,0 +1,45 @@
+{
+  "appId": "com.lumina.constellation",
+  "appName": "Lumina Constellation",
+  "webDir": "out",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "ios": {
+    "contentInset": "always",
+    "limitsNavigationsToAppBoundDomains": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#0A0F1F",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "LIGHT",
+      "backgroundColor": "#0A0F1F"
+    },
+    "App": {
+      "backgroundColor": "#0A0F1F"
+    }
+  },
+  "routes": [
+    { "path": "/", "name": "Home" },
+    { "path": "/spiritual", "name": "Lumina Spiritual" },
+    { "path": "/storybook", "name": "Storybook Studio" },
+    { "path": "/dream", "name": "Dream Journal" },
+    { "path": "/memorial", "name": "Memorial" },
+    { "path": "/family-atlas", "name": "Family Atlas" },
+    { "path": "/caregiver", "name": "AI Caregiver Support" },
+    { "path": "/toolkit", "name": "AI Toolkit" },
+    { "path": "/privacy", "name": "Privacy Policy" },
+    { "path": "/terms", "name": "Terms of Service" },
+    { "path": "/disclaimer", "name": "Disclaimer" }
+  ]
+}

@@ -139,7 +139,7 @@ export function UpgradeButton() {
           })}
         </div>
         <p className="text-purple-300/30 text-[9px] text-center">
-          {process.env.STRIPE_SECRET_KEY ? '🔒 Secure Stripe payment' : 'Test mode — no real charge. Set STRIPE_SECRET_KEY for live payments.'}
+          {process.env.LIANLIAN_API_KEY ? '🔒 Secure payment via LianLian' : 'Test mode — no real charge. Set LIANLIAN_API_KEY for live payments.'}
         </p>
       </DialogContent>
     </Dialog>

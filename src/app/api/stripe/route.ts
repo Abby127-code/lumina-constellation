@@ -1,15 +1,16 @@
 /**
- * Stripe 订阅 API（V5：支持真实 Checkout Session + mock 自动切换）
- * POST /api/stripe { action, ... }
+ * LianLian Payment API (连连支付)
+ * POST /api/stripe { action, plan, userId, email }
  *
- * 三层订阅：
- * - Free: 3 次/日，免费
- * - Pro: $19/月，无限访问全部 8 赛道
- * - Premium: $39/月，无限 + 商业授权 + API
+ * LianLian Global (连连国际) supports cross-border subscriptions.
+ * API docs: https://developer.lianlianpay.com/
  *
- * 模式自动切换：
- * - 配置了 STRIPE_SECRET_KEY → 真实 Stripe Checkout
- * - 未配置 → Mock 模式（直接升级，无扣费，用于测试）
+ * 三层定价:
+ * - Free: 3 次免费试用
+ * - Monthly: $4.99/月
+ * - Yearly: $47.90/年 (8折)
+ *
+ * 未配置 LIANLIAN_API_KEY 时自动使用 mock 模式（无真实扣费）
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
@@ -21,74 +22,45 @@ export const PLANS = {
   free: {
     name: 'Free',
     price: 0,
-    dailyLimit: 3, // 3 free trial uses (lifetime)
+    limit: 3,
     features: ['3 free trial generations', 'No credit card needed'],
-    stripePriceId: null,
   },
   monthly: {
     name: 'Monthly',
     price: 4.99,
-    dailyLimit: Infinity,
+    limit: Infinity,
     features: ['Unlimited generations', 'Full feature unlock', 'History & favorites', 'Cancel anytime'],
-    stripePriceId: process.env.STRIPE_MONTHLY_PRICE_ID || 'price_monthly',
   },
   yearly: {
     name: 'Yearly',
-    price: 47.90, // $4.99 × 12 × 0.8 (20% off)
-    dailyLimit: Infinity,
-    features: ['Everything in Monthly', '20% off (save $11.98/yr)', 'Priority support', 'Early access to new features'],
-    stripePriceId: process.env.STRIPE_YEARLY_PRICE_ID || 'price_yearly',
+    price: 47.90,
+    limit: Infinity,
+    features: ['Everything in Monthly', '20% off (save $11.98)', 'Priority support', 'Early access'],
   },
 } as const;
 
 export type PlanId = keyof typeof PLANS;
 
-let _stripe: any = null;
-let _stripeChecked = false;
-async function getStripe() {
-  if (_stripeChecked) return _stripe;
-  _stripeChecked = true;
-  if (!process.env.STRIPE_SECRET_KEY) return null;
-  try {
-    const stripeModule = await import('stripe' as any).catch(() => null);
-    if (!stripeModule) {
-      console.warn('Stripe SDK not installed. Run: bun add stripe');
-      return null;
-    }
-    const { default: Stripe } = stripeModule;
-    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-12-18.acacia' as any,
-    });
-    return _stripe;
-  } catch (e: any) {
-    console.warn('Stripe init failed:', e?.message);
-    return null;
-  }
-}
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { action } = body as { action: string };
+    const { action } = body;
 
-    // ─── 创建 Checkout Session ───
+    // ─── Create payment order ───
     if (action === 'create-checkout') {
-      const { plan, userId, email } = body as { plan: PlanId; userId: string; email?: string };
+      const { plan, userId, email, productId } = body as { plan: PlanId; userId: string; email?: string; productId?: string };
       if (!PLANS[plan] || plan === 'free') {
         return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
       }
-      // Module plan requires specifying which product
-      const { productId } = body as { productId?: string };
       const planInfo = PLANS[plan];
-      const stripe = await getStripe();
 
-      // Mock 模式：直接升级
-      if (!stripe) {
+      // Mock mode: no real charge
+      if (!process.env.LIANLIAN_API_KEY) {
         const periodDays = plan === 'yearly' ? 365 : 30;
         await db.user.update({
           where: { id: userId },
           data: {
-            plan: plan === 'free' ? 'free' : 'pro', // pro = paid (monthly or yearly)
+            plan: 'pro',
             subStatus: 'active',
             currentPeriodEnd: new Date(Date.now() + periodDays * 86400 * 1000),
           },
@@ -96,128 +68,83 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           success: true,
           mock: true,
-          message: `Upgraded to ${planInfo.name} ($${planInfo.price}${plan === 'yearly' ? '/yr' : '/mo'}) — test mode, no real charge`,
+          message: `Upgraded to ${planInfo.name} ($${planInfo.price}${plan === 'yearly' ? '/yr' : '/mo'}) — test mode`,
           plan,
         });
       }
 
-      // 真实 Stripe 模式
+      // Real LianLian payment mode
+      // In production, create a LianLian payment order and return checkout URL
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const session = await stripe.checkout.sessions.create({
-        mode: 'subscription',
-        payment_method_types: ['card'],
-        line_items: [
-          {
-            price: planInfo.stripePriceId,
-            quantity: 1,
-          },
-        ],
-        success_url: `${appUrl}/?track=account&status=success&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${appUrl}/?track=account&status=cancel`,
-        client_reference_id: userId,
-        customer_email: email,
-        metadata: {
-          userId,
-          plan,
-        },
-        subscription_data: {
-          metadata: { userId, plan },
-        },
-        allow_promotion_codes: true,
-      });
+      const orderId = `LUMINA-${userId.slice(-8)}-${Date.now()}`;
+      const returnUrl = `${appUrl}/?payment=success&order=${orderId}`;
+      const notifyUrl = `${appUrl}/api/lianlian-webhook`;
 
-      return NextResponse.json({
-        success: true,
-        url: session.url,
-        sessionId: session.id,
-      });
+      // LianLian Global Checkout API call
+      const paymentData = {
+        merchant_id: process.env.LIANLIAN_MERCHANT_ID,
+        merchant_order_id: orderId,
+        amount: planInfo.price,
+        currency: 'USD',
+        product_name: `${planInfo.name} Subscription - Lumina ${productId || 'Product'}`,
+        return_url: returnUrl,
+        notify_url: notifyUrl,
+        buyer_id: userId,
+        buyer_email: email,
+        // LianLian will generate a hosted checkout page
+      };
+
+      try {
+        const response = await fetch('https://api.lianlianpay.com/v1/checkout/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.LIANLIAN_API_KEY}`,
+          },
+          body: JSON.stringify(paymentData),
+        });
+        const result = await response.json();
+        if (result.checkout_url) {
+          return NextResponse.json({ success: true, url: result.checkout_url, orderId });
+        }
+        throw new Error(result.message || 'LianLian API error');
+      } catch (e: any) {
+        console.error('LianLian payment error:', e);
+        return NextResponse.json({ error: e?.message || 'Payment failed' }, { status: 500 });
+      }
     }
 
-    // ─── 取消订阅 ───
+    // ─── Cancel subscription ───
     if (action === 'cancel') {
       const { userId } = body as { userId: string };
-      const user = await db.user.findUnique({ where: { id: userId } });
-      if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-
-      const stripe = await getStripe();
-      if (stripe && user.stripeSubId) {
-        // 真实 Stripe：标记订阅在周期结束时取消
-        await stripe.subscriptions.update(user.stripeSubId, {
-          cancel_at_period_end: true,
-        });
-        await db.user.update({
-          where: { id: userId },
-          data: { subStatus: 'canceled' },
-        });
-      } else {
-        // Mock 模式：立即降级
-        await db.user.update({
-          where: { id: userId },
-          data: {
-            plan: 'free',
-            subStatus: 'canceled',
-            stripeSubId: null,
-          },
-        });
-      }
+      await db.user.update({
+        where: { id: userId },
+        data: { plan: 'free', subStatus: 'canceled', stripeSubId: null },
+      });
       return NextResponse.json({ success: true, plan: 'free' });
     }
 
-    // ─── 创建 Customer Portal（管理订阅） ───
-    if (action === 'create-portal') {
-      const { userId } = body as { userId: string };
-      const user = await db.user.findUnique({ where: { id: userId } });
-      if (!user?.stripeCustomerId) {
-        return NextResponse.json({ error: 'No Stripe customer' }, { status: 400 });
-      }
-      const stripe = await getStripe();
-      if (!stripe) {
-        return NextResponse.json({ error: 'Stripe not configured' }, { status: 400 });
-      }
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const session = await stripe.billingPortal.sessions.create({
-        customer: user.stripeCustomerId,
-        return_url: `${appUrl}/?track=account`,
-      });
-      return NextResponse.json({ url: session.url });
-    }
-
-    // ─── 检查配额 ───
+    // ─── Check quota ───
     if (action === 'check-quota') {
       const { userId } = body as { userId: string };
       const user = await db.user.findUnique({ where: { id: userId } });
       if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-      // Map DB plan to pricing tier: free→free, pro→monthly/yearly (both unlimited)
       const isPaid = user.plan === 'pro' || user.plan === 'premium';
       const tier: PlanId = isPaid ? 'monthly' : 'free';
-      const limit = PLANS[tier].dailyLimit;
+      const limit = PLANS[tier].limit;
+      const used = user.dailyUsageCount || 0;
 
-      const today = new Date().toISOString().slice(0, 10);
-      if (user.dailyUsageDate !== today) {
-        await db.user.update({
-          where: { id: userId },
-          data: { dailyUsageDate: today, dailyUsageCount: 0 },
-        });
-        return NextResponse.json({
-          plan: user.plan,
-          tier,
-          used: 0,
-          limit: limit === Infinity ? 'unlimited' : limit,
-          remaining: limit === Infinity ? 'unlimited' : limit,
-        });
-      }
-      const remaining = limit === Infinity ? 'unlimited' : Math.max(0, limit - user.dailyUsageCount);
       return NextResponse.json({
         plan: user.plan,
         tier,
-        used: user.dailyUsageCount,
+        used,
         limit: limit === Infinity ? 'unlimited' : limit,
-        remaining,
+        remaining: limit === Infinity ? 'unlimited' : Math.max(0, limit - used),
       });
     }
 
-    // ─── 增加使用计数 ───
+    // ─── Increment usage ───
     if (action === 'increment-usage') {
       const { userId } = body as { userId: string };
       await db.user.update({
@@ -229,22 +156,16 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   } catch (err: any) {
-    console.error('Stripe API error:', err);
+    console.error('Payment API error:', err);
     return NextResponse.json({ error: err?.message }, { status: 500 });
   }
 }
 
 export async function GET() {
   return NextResponse.json({
-    service: 'Lumina Stripe API V5',
+    service: 'Lumina Payment API (LianLian)',
     plans: PLANS,
-    mode: process.env.STRIPE_SECRET_KEY ? 'live' : 'mock',
-    features: [
-      'create-checkout (real Stripe Checkout Session)',
-      'cancel (subscription cancel)',
-      'create-portal (Stripe Customer Portal)',
-      'check-quota (daily quota)',
-      'increment-usage',
-    ],
+    mode: process.env.LIANLIAN_API_KEY ? 'live' : 'mock',
+    provider: 'LianLian Global (连连国际)',
   });
 }
