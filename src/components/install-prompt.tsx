@@ -65,7 +65,7 @@ export function InstallPrompt() {
             <Download className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-gold text-sm font-semibold">Install Lumina Constellation</p>
+            <p className="text-gold text-sm font-semibold">Install App</p>
             <p className="text-purple-200/60 text-xs mt-0.5">Add to your home screen for a native app experience</p>
             <div className="flex items-center gap-2 mt-3">
               <Button size="sm" onClick={handleInstall} className="bg-gradient-to-r from-amber-500 to-amber-600 text-black text-xs">

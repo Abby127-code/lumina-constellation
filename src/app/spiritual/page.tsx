@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { StandaloneProduct } from '@/components/standalone-product';
+import { StandaloneProduct } from '@/components/product-page';
 import type { ProductId } from '@/lib/product-types';
 
 export const metadata: Metadata = {

@@ -11,7 +11,7 @@ import { AccountButton } from '@/components/account-button';
 import { UpgradeButton } from '@/components/upgrade-button';
 import { InstallPrompt } from '@/components/install-prompt';
 import { Toaster } from '@/components/ui/toaster';
-import { ArrowLeft, Cpu, Sparkles, Check, Star, TrendingUp } from 'lucide-react';
+import { Cpu, Check, Star, TrendingUp, Sparkles } from 'lucide-react';
 import { useSession } from '@/lib/session';
 import type { ProductId } from '@/lib/product-types';
 import { MysticApp } from '@/components/apps/mystic-app';
@@ -22,13 +22,13 @@ import { GenealogyApp } from '@/components/apps/genealogy-app';
 import { CaregiverApp } from '@/components/apps/caregiver-app';
 import { DirectoryApp } from '@/components/apps/directory-app';
 import { LocaleProvider } from '@/components/locale-provider';
-import ReactMarkdown from 'react-markdown';
 
 interface ProductConfig {
   name: string;
   tagline: string;
   icon: string;
   theme: string;
+  domain: string; // independent brand, no "Lumina Constellation" mention
   heroTitle: string;
   heroSubtitle: string;
   features: { title: string; desc: string }[];
@@ -36,11 +36,12 @@ interface ProductConfig {
   faqs: { q: string; a: string }[];
   market: string;
   badge: string;
+  footerLinks: { label: string; href: string }[];
 }
 
 const CONFIGS: Record<ProductId, ProductConfig> = {
   mystic: {
-    name: 'Lumina Spiritual', tagline: 'Astrology · Tarot · Numerology · Daily Energy', icon: '✦', theme: 'theme-mystic',
+    name: 'Lumina Spiritual', tagline: 'Astrology · Tarot · Numerology · Daily Energy', icon: '✦', theme: 'theme-mystic', domain: 'spiritual',
     heroTitle: 'Discover Your Cosmic Blueprint',
     heroSubtitle: 'Birth charts, tarot readings, numerology, and daily energy reports — all in one place. Deep, insightful, warm guidance for your spiritual journey.',
     features: [
@@ -56,9 +57,13 @@ const CONFIGS: Record<ProductId, ProductConfig> = {
       { q: 'Is this entertainment or real guidance?', a: 'Our readings are for entertainment and self-reflection. They are not medical, psychological, or financial advice.' },
     ],
     market: 'CAGR 19.8% · $5.69B → $11.71B', badge: 'TOP PICK',
+    footerLinks: [
+      { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' },
+      { label: 'Disclaimer', href: '/disclaimer' }, { label: 'Contact', href: '/contact' },
+    ],
   },
   storybook: {
-    name: 'Storybook Studio', tagline: 'Personalized children\'s stories · Illustrated · Printable', icon: '★', theme: 'theme-storybook',
+    name: 'Storybook Studio', tagline: 'Personalized children\'s stories · Illustrated · Printable', icon: '★', theme: 'theme-storybook', domain: 'storybook',
     heroTitle: 'Create Magical Stories for Your Child',
     heroSubtitle: 'Turn your child into the hero of their own adventure. Personalized names, themes, illustration styles, and moral lessons. Print-ready format.',
     features: [
@@ -74,9 +79,13 @@ const CONFIGS: Record<ProductId, ProductConfig> = {
       { q: 'How long are the stories?', a: '800-1200 words across 5-8 illustrated pages. Perfect for bedtime reading.' },
     ],
     market: 'CAGR 21.8% · $3.2B → $18.7B', badge: 'HIGH VALUE',
+    footerLinks: [
+      { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' },
+      { label: 'Disclaimer', href: '/disclaimer' }, { label: 'Contact', href: '/contact' },
+    ],
   },
   dream: {
-    name: 'Dream Journal', tagline: 'Record · Interpret · Track your subconscious', icon: '🌙', theme: 'theme-dream',
+    name: 'Dream Journal', tagline: 'Record · Interpret · Track your subconscious', icon: '🌙', theme: 'theme-dream', domain: 'dream',
     heroTitle: 'Understand What Your Dreams Are Telling You',
     heroSubtitle: 'Record your dreams and get multi-perspective interpretations. Track recurring themes. Discover patterns in your subconscious over time.',
     features: [
@@ -92,9 +101,13 @@ const CONFIGS: Record<ProductId, ProductConfig> = {
       { q: 'Can I track patterns over time?', a: 'Yes, your dream history is always available. Look for recurring symbols, emotions, and themes.' },
     ],
     market: '$2.99B · CAGR 16.3%', badge: 'DAILY USE',
+    footerLinks: [
+      { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' },
+      { label: 'Disclaimer', href: '/disclaimer' }, { label: 'Contact', href: '/contact' },
+    ],
   },
   memorial: {
-    name: 'Memorial', tagline: 'Tribute biographies · Healing letters · Forever memories', icon: '✧', theme: 'theme-memorial',
+    name: 'Memorial', tagline: 'Tribute biographies · Healing letters · Forever memories', icon: '✧', theme: 'theme-memorial', domain: 'memorial',
     heroTitle: 'Honor Those Who Matter Most',
     heroSubtitle: 'Create a beautiful tribute biography for your loved one. Capture their personality, memories, and legacy. Receive a letter in their voice — a gentle farewell.',
     features: [
@@ -110,9 +123,13 @@ const CONFIGS: Record<ProductId, ProductConfig> = {
       { q: 'How long does it take?', a: 'About 20-30 seconds. The biography and letter are generated instantly.' },
     ],
     market: 'Pre-Need Death Care $120B · CAGR 6.5%', badge: 'BLUE OCEAN',
+    footerLinks: [
+      { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' },
+      { label: 'Disclaimer', href: '/disclaimer' }, { label: 'Contact', href: '/contact' },
+    ],
   },
   genealogy: {
-    name: 'Family Atlas', tagline: 'Family stories · Origins · Heritage narratives', icon: '✦', theme: 'theme-genealogy',
+    name: 'Family Atlas', tagline: 'Family stories · Origins · Heritage narratives', icon: '✦', theme: 'theme-genealogy', domain: 'family-atlas',
     heroTitle: 'Weave Your Family\'s Story',
     heroSubtitle: 'Document your family members, origins, and traditions. Preserve your bloodline story in a beautiful narrative for future generations.',
     features: [
@@ -128,9 +145,13 @@ const CONFIGS: Record<ProductId, ProductConfig> = {
       { q: 'Is this suitable for creating a family heirloom?', a: 'Absolutely. The narrative format is perfect for printing and passing down to children.' },
     ],
     market: 'r/Genealogy 500K+ · Long-tail high-paying', badge: 'LONG TAIL',
+    footerLinks: [
+      { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' },
+      { label: 'Disclaimer', href: '/disclaimer' }, { label: 'Contact', href: '/contact' },
+    ],
   },
   caregiver: {
-    name: 'AI Caregiver Support', tagline: '24/7 assistant for family caregivers', icon: '★', theme: 'theme-caregiver',
+    name: 'AI Caregiver Support', tagline: '24/7 assistant for family caregivers', icon: '★', theme: 'theme-caregiver', domain: 'caregiver',
     heroTitle: 'You\'re Not Alone in This',
     heroSubtitle: '63 million Americans care for sick or elderly family members. Get 24/7 guidance on symptoms, emotional support, medication questions, and care logging.',
     features: [
@@ -146,9 +167,13 @@ const CONFIGS: Record<ProductId, ProductConfig> = {
       { q: 'Can it help with caregiver burnout?', a: 'Yes. The emotional support feature is designed specifically for caregiver burnout, stress, and guilt.' },
     ],
     market: 'CAGR 16% · $1.71B → $7.5B · 63M US caregivers', badge: 'ESSENTIAL',
+    footerLinks: [
+      { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' },
+      { label: 'Disclaimer', href: '/disclaimer' }, { label: 'Contact', href: '/contact' },
+    ],
   },
   directory: {
-    name: 'AI Toolkit', tagline: 'AI Tools Directory + Prompt Library', icon: '✧', theme: 'theme-directory',
+    name: 'AI Toolkit', tagline: 'AI Tools Directory + Prompt Library', icon: '✧', theme: 'theme-directory', domain: 'toolkit',
     heroTitle: 'Find the Right AI Tool, Every Time',
     heroSubtitle: 'Browse curated AI tools, agents, and SaaS products. Generate, save, and share powerful prompts. Everything AI, in one place.',
     features: [
@@ -164,6 +189,10 @@ const CONFIGS: Record<ProductId, ProductConfig> = {
       { q: 'What models are supported?', a: 'ChatGPT, Claude, Gemini, and Midjourney prompt templates are available.' },
     ],
     market: '$34K MRR directory + $1.3B prompts market', badge: 'AI TOOL',
+    footerLinks: [
+      { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' },
+      { label: 'Disclaimer', href: '/disclaimer' }, { label: 'Contact', href: '/contact' },
+    ],
   },
 };
 
@@ -225,7 +254,7 @@ export function StandaloneProduct({ productId }: Props) {
 
   if (!bootstrapped) {
     return (
-      <div className={`product-app-root ${cfg.theme} flex items-center justify-center`}>
+      <div className={`product-app-root ${cfg.theme} flex items-center justify-center min-h-screen`}>
         <div className="text-center">
           <Sparkles className="w-12 h-12 text-amber-400 mx-auto animate-float" />
           <p className="product-app-header mt-4 text-sm tracking-widest">LOADING {cfg.name.toUpperCase()}...</p>
@@ -236,19 +265,13 @@ export function StandaloneProduct({ productId }: Props) {
 
   return (
     <LocaleProvider>
-      <div className={`product-app-root ${cfg.theme} relative overflow-hidden`}>
-        {/* Header */}
+      <div className={`product-app-root ${cfg.theme} relative overflow-hidden min-h-screen`}>
+        {/* Header — independent brand, no "Sky" back button */}
         <header className="relative z-10 border-b border-[var(--p-border)] bg-black/20 backdrop-blur-md sticky top-0">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <a href="/" className="flex items-center gap-1 product-app-muted hover:opacity-80 text-xs shrink-0">
-                <ArrowLeft className="w-4 h-4" /> Sky
-              </a>
-              <div className="w-px h-6 bg-[var(--p-border)]" />
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{cfg.icon}</span>
-                <h1 className="text-sm sm:text-base font-bold product-app-header truncate" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{cfg.name}</h1>
-              </div>
+              <span className="text-lg">{cfg.icon}</span>
+              <h1 className="text-sm sm:text-lg font-bold product-app-header truncate" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{cfg.name}</h1>
             </div>
             <div className="flex items-center gap-1 shrink-0">
               <LanguageSwitcher /><ThemeToggle />
@@ -258,7 +281,7 @@ export function StandaloneProduct({ productId }: Props) {
           </div>
         </header>
 
-        {/* Hero Section */}
+        {/* Hero */}
         <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-12 pb-8 text-center">
           <Badge className={`mb-4 ${cfg.badge === 'TOP PICK' ? 'bg-amber-500 text-black' : cfg.badge === 'HIGH VALUE' ? 'bg-rose-500 text-white' : cfg.badge === 'DAILY USE' ? 'bg-sky-600 text-white' : cfg.badge === 'BLUE OCEAN' ? 'bg-purple-600 text-white' : cfg.badge === 'ESSENTIAL' ? 'bg-pink-600 text-white' : cfg.badge === 'LONG TAIL' ? 'bg-yellow-700 text-white' : 'bg-emerald-600 text-white'} text-[10px]`}>{cfg.badge}</Badge>
           <h2 className="text-2xl sm:text-4xl font-bold product-app-header mb-3" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{cfg.heroTitle}</h2>
@@ -269,7 +292,7 @@ export function StandaloneProduct({ productId }: Props) {
           </div>
         </section>
 
-        {/* Features Grid */}
+        {/* Features */}
         <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pb-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {cfg.features.map((f, i) => (
@@ -286,7 +309,7 @@ export function StandaloneProduct({ productId }: Props) {
           </div>
         </section>
 
-        {/* Interactive App */}
+        {/* App */}
         <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pb-8">
           <div className="text-center mb-4">
             <h3 className="text-lg product-app-header font-semibold" style={{ fontFamily: 'var(--font-cormorant), serif' }}>Try It Now</h3>
@@ -297,7 +320,7 @@ export function StandaloneProduct({ productId }: Props) {
 
         {/* Examples */}
         <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pb-8">
-          <h3 className="text-lg product-app-header font-semibold mb-3 text-center" style={{ fontFamily: 'var(--font-cormorant), serif' }}>What You\'ll Get</h3>
+          <h3 className="text-lg product-app-header font-semibold mb-3 text-center" style={{ fontFamily: 'var(--font-cormorant), serif' }}>What You&apos;ll Get</h3>
           <div className="space-y-2">
             {cfg.examples.map((ex, i) => (
               <div key={i} className="product-app-card rounded-lg p-3 flex items-start gap-2">
@@ -333,14 +356,26 @@ export function StandaloneProduct({ productId }: Props) {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="relative z-10 mt-4 pt-4 border-t border-[var(--p-border)] text-center pb-6">
-          <div className="flex items-center justify-center gap-2 product-app-muted text-[10px] flex-wrap">
-            <span>{cfg.icon} {cfg.name}</span><span>·</span>
-            <a href="/" className="hover:opacity-80">Lumina Constellation</a>
-            {aiProvider && <Badge variant="outline" className={`text-[8px] ${aiFree ? 'border-emerald-400/30 text-emerald-300/70' : ''}`}><Cpu className="w-2 h-2 mr-0.5" />{aiProvider}{aiFree && ' · Free'}</Badge>}
+        {/* Footer — independent, no "Lumina Constellation" mention */}
+        <footer className="relative z-10 mt-4 pt-4 border-t border-[var(--p-border)] pb-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+            <p className="product-app-muted text-[10px] mb-3">© 2025 {cfg.name}. All rights reserved.</p>
+            <div className="flex items-center justify-center gap-3 text-[10px] product-app-muted flex-wrap">
+              {cfg.footerLinks.map((link, i) => (
+                <a key={i} href={link.href} className="hover:opacity-80">{link.label}</a>
+              ))}
+              {aiProvider && (
+                <Badge variant="outline" className={`text-[8px] ${aiFree ? 'border-emerald-400/30 text-emerald-300/70' : ''}`}>
+                  <Cpu className="w-2 h-2 mr-0.5" />{aiProvider}{aiFree && ' · Free'}
+                </Badge>
+              )}
+            </div>
+            <p className="product-app-muted text-[9px] mt-3 italic max-w-md mx-auto">
+              For entertainment and self-reflection purposes only. Not medical, psychological, legal, or financial advice.
+            </p>
           </div>
         </footer>
+
         <Toaster />
         <InstallPrompt />
       </div>

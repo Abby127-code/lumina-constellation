@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { StandaloneProduct } from '@/components/standalone-product';
+import { StandaloneProduct } from '@/components/product-page';
 
 export const metadata: Metadata = {
   title: 'AI Toolkit · AI Tools Directory + Prompt Library',
