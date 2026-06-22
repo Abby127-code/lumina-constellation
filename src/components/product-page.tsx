@@ -199,7 +199,7 @@ const CONFIGS: Record<ProductId, ProductConfig> = {
 
 interface Props { productId: ProductId; }
 
-export function StandaloneProduct({ productId }: Props) {
+export function ProductPage({ productId }: Props) {
   const { user, setUser } = useSession();
   const [bootstrapped, setBootstrapped] = useState(false);
   const [aiProvider, setAiProvider] = useState('');

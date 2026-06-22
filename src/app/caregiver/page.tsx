@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
-import { StandaloneProduct } from '@/components/product-page';
+import { ProductPage } from '@/components/product-page';
 
 export const metadata: Metadata = {
-  title: 'AI Caregiver Support · 24/7 Assistant for Family Caregivers',
-  description: 'An AI assistant for family caregivers. Symptom guidance, emotional support, medication tracking, care logging. For the 63 million Americans caring for loved ones.',
-  keywords: ['caregiver', 'elderly care', 'family caregiving', 'AI assistant', 'care support'],
-  openGraph: { title: 'AI Caregiver Support', description: '24/7 assistant for family caregivers', type: 'website' },
+  title: 'AI Caregiver Support',
+  description: '24/7 AI assistant for family caregivers. Symptom guidance and emotional support.',
+  openGraph: { title: 'AI Caregiver Support', description: '24/7 AI assistant for family caregivers. Symptom guidance and emotional support.', type: 'website', url: '/caregiver' },
+  twitter: { card: 'summary_large_image', title: 'AI Caregiver Support', description: '24/7 AI assistant for family caregivers. Symptom guidance and emotional support.' },
   alternates: { canonical: '/caregiver' },
 };
 
 export default function Page() {
-  return <StandaloneProduct productId="caregiver" />;
+  return <ProductPage productId="caregiver" />;
 }

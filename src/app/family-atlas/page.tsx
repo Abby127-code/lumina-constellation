@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
-import { StandaloneProduct } from '@/components/product-page';
+import { ProductPage } from '@/components/product-page';
 
 export const metadata: Metadata = {
   title: 'Family Atlas · Family Stories · Origins · Heritage Narratives',
-  description: 'Weave your family\'s history into a beautiful narrative. Document members, origins, traditions. Preserve your bloodline story for future generations.',
-  keywords: ['genealogy', 'family tree', 'family history', 'heritage', 'ancestry', 'family stories'],
-  openGraph: { title: 'Family Atlas', description: 'Family stories · Origins · Heritage', type: 'website' },
+  description: "Weave your family's history into a beautiful narrative. Document members, origins, traditions. Preserve your bloodline story.",
+  openGraph: { title: 'Family Atlas', description: "Family stories, origins, and heritage narratives", type: 'website', url: '/family-atlas' },
+  twitter: { card: 'summary_large_image', title: 'Family Atlas', description: 'Family stories and heritage' },
   alternates: { canonical: '/family-atlas' },
 };
 
 export default function Page() {
-  return <StandaloneProduct productId="genealogy" />;
+  return <ProductPage productId="genealogy" />;
 }
