@@ -33,9 +33,9 @@ function useAI() {
 }
 
 function Result({ result, loading }: { result: string; loading: boolean }) {
-  if (loading) return <Card className="glass-card-dark border-rose-400/30 mt-4"><CardContent className="py-12 flex flex-col items-center gap-3"><Sparkles className="w-10 h-10 text-rose-300 animate-float" /><p className="text-rose-200/80 text-sm">Spinning a tale...</p></CardContent></Card>;
+  if (loading) return <Card className="product-app-card [var(--p-border)] mt-4"><CardContent className="py-12 flex flex-col items-center gap-3"><Sparkles className="w-10 h-10 product-app-accent animate-float" /><p className="product-app-muted text-sm">Spinning a tale...</p></CardContent></Card>;
   if (!result) return null;
-  return <Card className="glass-card-dark border-rose-400/30 mt-4 animate-glow-pulse"><CardContent className="pt-6"><div className="text-rose-50/90 leading-relaxed space-y-3 text-sm sm:text-base"><ReactMarkdown components={{ h1: ({ children }) => <h1 className="text-2xl font-bold text-rose-300 mt-4 mb-2">{children}</h1>, h2: ({ children }) => <h2 className="text-xl font-semibold text-orange-200 mt-4 mb-2">{children}</h2>, h3: ({ children }) => <h3 className="text-base font-semibold text-amber-200 mt-3 mb-1">{children}</h3>, p: ({ children }) => <p className="text-rose-50/85 leading-relaxed">{children}</p>, ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 text-rose-50/85">{children}</ul>, ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 text-rose-50/85">{children}</ol>, strong: ({ children }) => <strong className="text-orange-200 font-semibold">{children}</strong>, blockquote: ({ children }) => <blockquote className="border-l-2 border-rose-400/50 pl-4 italic text-rose-200/70 my-2">{children}</blockquote> }}>{result}</ReactMarkdown></div></CardContent></Card>;
+  return <Card className="product-app-card [var(--p-border)] mt-4 animate-glow-pulse"><CardContent className="pt-6"><div className="text-rose-50/90 leading-relaxed space-y-3 text-sm sm:text-base"><ReactMarkdown components={{ h1: ({ children }) => <h1 className="text-2xl font-bold product-app-accent mt-4 mb-2">{children}</h1>, h2: ({ children }) => <h2 className="text-xl font-semibold product-app-header mt-4 mb-2">{children}</h2>, h3: ({ children }) => <h3 className="text-base font-semibold product-app-header mt-3 mb-1">{children}</h3>, p: ({ children }) => <p className="[color:var(--p-text)] leading-relaxed">{children}</p>, ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 [color:var(--p-text)]">{children}</ul>, ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 [color:var(--p-text)]">{children}</ol>, strong: ({ children }) => <strong className="product-app-header font-semibold">{children}</strong>, blockquote: ({ children }) => <blockquote className="border-l-2 [var(--p-border)] pl-4 italic product-app-muted/70 my-2">{children}</blockquote> }}>{result}</ReactMarkdown></div></CardContent></Card>;
 }
 
 export function StorybookApp() {
@@ -53,30 +53,30 @@ export function StorybookApp() {
 
   return (
     <div className="space-y-4">
-      <Card className="glass-card-dark border-rose-400/30">
+      <Card className="product-app-card [var(--p-border)]">
         <CardContent className="pt-6 space-y-4">
-          <div className="flex items-center gap-2 text-rose-200">
-            <BookOpen className="w-5 h-5 text-rose-300" />
+          <div className="flex items-center gap-2 product-app-muted">
+            <BookOpen className="w-5 h-5 product-app-accent" />
             <h2 className="text-lg font-semibold">Create a Personalized Story</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-rose-200/80 text-xs">Child's Name</Label>
-              <Input value={childName} onChange={(e) => setChildName(e.target.value)} placeholder="e.g. Emma" className="bg-white/5 border-rose-400/30 text-white" />
+              <Label className="product-app-muted text-xs">Child's Name</Label>
+              <Input value={childName} onChange={(e) => setChildName(e.target.value)} placeholder="e.g. Emma" className="product-app-input" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-rose-200/80 text-xs">Age</Label>
+              <Label className="product-app-muted text-xs">Age</Label>
               <Select value={childAge} onValueChange={setChildAge}>
-                <SelectTrigger className="bg-white/5 border-rose-400/30 text-white"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="product-app-input"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {[3, 4, 5, 6, 7, 8, 9, 10].map((a) => <SelectItem key={a} value={String(a)}>{a} years old</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-rose-200/80 text-xs">Theme</Label>
+              <Label className="product-app-muted text-xs">Theme</Label>
               <Select value={theme} onValueChange={setTheme}>
-                <SelectTrigger className="bg-white/5 border-rose-400/30 text-white"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="product-app-input"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="brave">Bravery</SelectItem>
                   <SelectItem value="friendship">Friendship</SelectItem>
@@ -88,9 +88,9 @@ export function StorybookApp() {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-rose-200/80 text-xs">Art Style</Label>
+              <Label className="product-app-muted text-xs">Art Style</Label>
               <Select value={artStyle} onValueChange={setArtStyle}>
-                <SelectTrigger className="bg-white/5 border-rose-400/30 text-white"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="product-app-input"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="watercolor">Watercolor</SelectItem>
                   <SelectItem value="cartoon">Cartoon</SelectItem>
@@ -102,15 +102,15 @@ export function StorybookApp() {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-rose-200/80 text-xs">Special Request (optional)</Label>
-            <Input value={specialRequest} onChange={(e) => setSpecialRequest(e.target.value)} placeholder="e.g. Include a pet dragon named Pickle" className="bg-white/5 border-rose-400/30 text-white" />
+            <Label className="product-app-muted text-xs">Special Request (optional)</Label>
+            <Input value={specialRequest} onChange={(e) => setSpecialRequest(e.target.value)} placeholder="e.g. Include a pet dragon named Pickle" className="product-app-input" />
           </div>
           <Button onClick={submit} disabled={loading || !childName.trim()} className="w-full bg-gradient-to-r from-rose-500 to-orange-500 text-white">
             {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <BookOpen className="w-4 h-4 mr-2" />}Create Story
           </Button>
         </CardContent>
       </Card>
-      {metadata?.imagePrompt && <Card className="glass-card-dark border-orange-400/30 mt-3"><CardContent className="pt-4"><p className="text-xs text-orange-200/70 mb-1">Image Prompt</p><p className="text-xs text-orange-100/80 italic">{metadata.imagePrompt}</p></CardContent></Card>}
+      {metadata?.imagePrompt && <Card className="product-app-card border-orange-400/30 mt-3"><CardContent className="pt-4"><p className="text-xs product-app-header/70 mb-1">Image Prompt</p><p className="text-xs text-orange-100/80 italic">{metadata.imagePrompt}</p></CardContent></Card>}
       <Result result={result} loading={loading} />
     </div>
   );

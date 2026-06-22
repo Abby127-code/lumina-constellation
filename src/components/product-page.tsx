@@ -10,6 +10,7 @@ import { NotificationBell } from '@/components/notification-bell';
 import { AccountButton } from '@/components/account-button';
 import { UpgradeButton } from '@/components/upgrade-button';
 import { InstallPrompt } from '@/components/install-prompt';
+import { ShareButtons } from '@/components/share-buttons';
 import { Toaster } from '@/components/ui/toaster';
 import { Cpu, Check, Star, TrendingUp, Sparkles } from 'lucide-react';
 import { useSession } from '@/lib/session';
@@ -290,6 +291,7 @@ export function StandaloneProduct({ productId }: Props) {
             <span className="text-[10px] product-app-muted flex items-center gap-1"><TrendingUp className="w-3 h-3" /> {cfg.market}</span>
             {aiProvider && <Badge variant="outline" className={`text-[9px] ${aiFree ? 'border-emerald-400/30 text-emerald-300/70' : ''}`}>{aiProvider}{aiFree && ' · Free'}</Badge>}
           </div>
+          <ShareButtons title={cfg.name} description={cfg.heroSubtitle} />
         </section>
 
         {/* Features */}

@@ -1,56 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url>
-    <loc>/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="/" />
-    <xhtml:link rel="alternate" hreflang="zh" href="/?locale=zh" />
-    <xhtml:link rel="alternate" hreflang="es" href="/?locale=es" />
-    <xhtml:link rel="alternate" hreflang="pt" href="/?locale=pt" />
-    <xhtml:link rel="alternate" hreflang="ja" href="/?locale=ja" />
-    <xhtml:link rel="alternate" hreflang="hi" href="/?locale=hi" />
-    <xhtml:link rel="alternate" hreflang="ar" href="/?locale=ar" />
-  </url>
-  <url>
-    <loc>/?track=mystic</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>/?track=storybook</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>/?track=directory</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>/?track=prompts</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>/?track=memorial</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>/?track=caregiver</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>/?track=genealogy</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>/?track=microsaas</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- 7 Independent Products -->
+  <url><loc>/spiritual</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/storybook</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/dream</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/memorial</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>/family-atlas</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>/caregiver</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>/toolkit</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <!-- Legal -->
+  <url><loc>/privacy</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>/terms</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>/disclaimer</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>/cookie-policy</loc><changefreq>monthly</changefreq><priority>0.2</priority></url>
+  <url><loc>/about</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>/contact</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
 </urlset>

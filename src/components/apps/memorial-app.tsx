@@ -34,9 +34,9 @@ function useAI() {
 }
 
 function Result({ result, loading }: { result: string; loading: boolean }) {
-  if (loading) return <Card className="glass-card-dark border-purple-400/30 mt-4"><CardContent className="py-12 flex flex-col items-center gap-3"><Sparkles className="w-10 h-10 text-purple-300 animate-float" /><p className="text-purple-200/80 text-sm">Honoring their memory...</p></CardContent></Card>;
+  if (loading) return <Card className="product-app-card border-purple-400/30 mt-4"><CardContent className="py-12 flex flex-col items-center gap-3"><Sparkles className="w-10 h-10 text-purple-300 animate-float" /><p className="text-purple-200/80 text-sm">Honoring their memory...</p></CardContent></Card>;
   if (!result) return null;
-  return <Card className="glass-card-dark border-purple-400/30 mt-4 animate-glow-pulse"><CardContent className="pt-6"><div className="text-purple-50/90 leading-relaxed space-y-3 text-sm sm:text-base"><ReactMarkdown components={{ h1: ({ children }) => <h1 className="text-2xl font-bold text-purple-300 mt-4 mb-2">{children}</h1>, h2: ({ children }) => <h2 className="text-xl font-semibold text-indigo-200 mt-4 mb-2">{children}</h2>, h3: ({ children }) => <h3 className="text-base font-semibold text-indigo-100 mt-3 mb-1">{children}</h3>, p: ({ children }) => <p className="text-purple-50/85 leading-relaxed">{children}</p>, ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 text-purple-50/85">{children}</ul>, ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 text-purple-50/85">{children}</ol>, strong: ({ children }) => <strong className="text-indigo-200 font-semibold">{children}</strong>, blockquote: ({ children }) => <blockquote className="border-l-2 border-purple-400/50 pl-4 italic text-purple-200/70 my-2">{children}</blockquote> }}>{result}</ReactMarkdown></div></CardContent></Card>;
+  return <Card className="product-app-card border-purple-400/30 mt-4 animate-glow-pulse"><CardContent className="pt-6"><div className="text-purple-50/90 leading-relaxed space-y-3 text-sm sm:text-base"><ReactMarkdown components={{ h1: ({ children }) => <h1 className="text-2xl font-bold text-purple-300 mt-4 mb-2">{children}</h1>, h2: ({ children }) => <h2 className="text-xl font-semibold text-indigo-200 mt-4 mb-2">{children}</h2>, h3: ({ children }) => <h3 className="text-base font-semibold text-indigo-100 mt-3 mb-1">{children}</h3>, p: ({ children }) => <p className="text-purple-50/85 leading-relaxed">{children}</p>, ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 text-purple-50/85">{children}</ul>, ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 text-purple-50/85">{children}</ol>, strong: ({ children }) => <strong className="text-indigo-200 font-semibold">{children}</strong>, blockquote: ({ children }) => <blockquote className="border-l-2 border-purple-400/50 pl-4 italic text-purple-200/70 my-2">{children}</blockquote> }}>{result}</ReactMarkdown></div></CardContent></Card>;
 }
 
 export function MemorialApp() {
@@ -56,7 +56,7 @@ export function MemorialApp() {
 
   return (
     <div className="space-y-4">
-      <Card className="glass-card-dark border-purple-400/30">
+      <Card className="product-app-card border-purple-400/30">
         <CardContent className="pt-6 space-y-4">
           <div className="flex items-center gap-2 text-purple-200">
             <Heart className="w-5 h-5 text-purple-300" />

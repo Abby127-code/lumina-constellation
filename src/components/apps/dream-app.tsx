@@ -34,9 +34,9 @@ function useAI() {
 }
 
 function Result({ result, loading }: { result: string; loading: boolean }) {
-  if (loading) return <Card className="glass-card-dark border-blue-400/30 mt-4"><CardContent className="py-12 flex flex-col items-center gap-3"><Sparkles className="w-10 h-10 text-blue-300 animate-float" /><p className="text-blue-200/80 text-sm">Reading the dream...</p></CardContent></Card>;
+  if (loading) return <Card className="product-app-card border-blue-400/30 mt-4"><CardContent className="py-12 flex flex-col items-center gap-3"><Sparkles className="w-10 h-10 text-blue-300 animate-float" /><p className="text-blue-200/80 text-sm">Reading the dream...</p></CardContent></Card>;
   if (!result) return null;
-  return <Card className="glass-card-dark border-blue-400/30 mt-4 animate-glow-pulse"><CardContent className="pt-6"><div className="text-blue-50/90 leading-relaxed space-y-3 text-sm sm:text-base"><ReactMarkdown components={{ h1: ({ children }) => <h1 className="text-2xl font-bold text-blue-300 mt-4 mb-2">{children}</h1>, h2: ({ children }) => <h2 className="text-xl font-semibold text-indigo-200 mt-4 mb-2">{children}</h2>, h3: ({ children }) => <h3 className="text-base font-semibold text-indigo-100 mt-3 mb-1">{children}</h3>, p: ({ children }) => <p className="text-blue-50/85 leading-relaxed">{children}</p>, ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 text-blue-50/85">{children}</ul>, ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 text-blue-50/85">{children}</ol>, strong: ({ children }) => <strong className="text-indigo-200 font-semibold">{children}</strong>, blockquote: ({ children }) => <blockquote className="border-l-2 border-blue-400/50 pl-4 italic text-blue-200/70 my-2">{children}</blockquote> }}>{result}</ReactMarkdown></div></CardContent></Card>;
+  return <Card className="product-app-card border-blue-400/30 mt-4 animate-glow-pulse"><CardContent className="pt-6"><div className="text-blue-50/90 leading-relaxed space-y-3 text-sm sm:text-base"><ReactMarkdown components={{ h1: ({ children }) => <h1 className="text-2xl font-bold text-blue-300 mt-4 mb-2">{children}</h1>, h2: ({ children }) => <h2 className="text-xl font-semibold text-indigo-200 mt-4 mb-2">{children}</h2>, h3: ({ children }) => <h3 className="text-base font-semibold text-indigo-100 mt-3 mb-1">{children}</h3>, p: ({ children }) => <p className="text-blue-50/85 leading-relaxed">{children}</p>, ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 text-blue-50/85">{children}</ul>, ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 text-blue-50/85">{children}</ol>, strong: ({ children }) => <strong className="text-indigo-200 font-semibold">{children}</strong>, blockquote: ({ children }) => <blockquote className="border-l-2 border-blue-400/50 pl-4 italic text-blue-200/70 my-2">{children}</blockquote> }}>{result}</ReactMarkdown></div></CardContent></Card>;
 }
 
 export function DreamApp() {
@@ -53,7 +53,7 @@ export function DreamApp() {
 
   return (
     <div className="space-y-4">
-      <Card className="glass-card-dark border-blue-400/30">
+      <Card className="product-app-card border-blue-400/30">
         <CardContent className="pt-6 space-y-4">
           <div className="flex items-center gap-2 text-blue-200">
             <Moon className="w-5 h-5 text-blue-300" />
@@ -100,7 +100,7 @@ export function DreamApp() {
           </Button>
         </CardContent>
       </Card>
-      {metadata?.symbols && <Card className="glass-card-dark border-indigo-400/30 mt-3"><CardContent className="pt-4"><p className="text-xs text-indigo-200/70 mb-2">Key Symbols</p><div className="flex flex-wrap gap-2">{metadata.symbols.map((s: string, i: number) => <span key={i} className="px-2 py-1 rounded-md bg-indigo-500/20 border border-indigo-400/30 text-indigo-100 text-xs">{s}</span>)}</div></CardContent></Card>}
+      {metadata?.symbols && <Card className="product-app-card border-indigo-400/30 mt-3"><CardContent className="pt-4"><p className="text-xs text-indigo-200/70 mb-2">Key Symbols</p><div className="flex flex-wrap gap-2">{metadata.symbols.map((s: string, i: number) => <span key={i} className="px-2 py-1 rounded-md bg-indigo-500/20 border border-indigo-400/30 text-indigo-100 text-xs">{s}</span>)}</div></CardContent></Card>}
       <Result result={result} loading={loading} />
     </div>
   );

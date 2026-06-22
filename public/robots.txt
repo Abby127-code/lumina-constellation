@@ -1,5 +1,17 @@
 User-agent: *
 Allow: /
+Allow: /spiritual
+Allow: /storybook
+Allow: /dream
+Allow: /memorial
+Allow: /family-atlas
+Allow: /caregiver
+Allow: /toolkit
+Allow: /privacy
+Allow: /terms
+Allow: /disclaimer
+Allow: /about
+Allow: /contact
 Disallow: /api/
 
 Sitemap: /sitemap.xml
