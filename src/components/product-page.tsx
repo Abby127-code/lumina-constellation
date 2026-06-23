@@ -361,7 +361,9 @@ export function ProductPage({ productId }: Props) {
         {/* Footer — independent, no "Lumina Constellation" mention */}
         <footer className="relative z-10 mt-4 pt-4 border-t border-[var(--p-border)] pb-6">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-            <p className="product-app-muted text-[10px] mb-3">© 2025 {cfg.name}. All rights reserved.</p>
+            <p className="product-app-muted text-[10px] mb-3">© 2025 {cfg.name}. All rights reserved. · support@dealcanny.com</p>
+            {/* ICP 备案号 — 备案通过后取消注释并替换 */}
+            {/* <a href="https://beian.miit.gov.cn/" className="product-app-muted text-[9px] hover:opacity-80">粤ICP备2025XXXXXX号</a> */}
             <div className="flex items-center justify-center gap-3 text-[10px] product-app-muted flex-wrap">
               {cfg.footerLinks.map((link, i) => (
                 <a key={i} href={link.href} className="hover:opacity-80">{link.label}</a>

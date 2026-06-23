@@ -40,10 +40,10 @@ export default function Page() {
                   account, billing, refunds, and product help.
                 </span>
                 <a
-                  href="mailto:support@lumina.constellation"
+                  href="mailto:support@dealcanny.com"
                   className="text-amber-300 hover:underline sm:text-right"
                 >
-                  support@lumina.constellation
+                  support@dealcanny.com
                 </a>
               </li>
               <li className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
@@ -52,10 +52,10 @@ export default function Page() {
                   GDPR, CCPA, and data deletion requests.
                 </span>
                 <a
-                  href="mailto:privacy@lumina.constellation"
+                  href="mailto:support@dealcanny.com"
                   className="text-amber-300 hover:underline sm:text-right"
                 >
-                  privacy@lumina.constellation
+                  support@dealcanny.com
                 </a>
               </li>
               <li className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
@@ -64,10 +64,10 @@ export default function Page() {
                   media inquiries and collaborations.
                 </span>
                 <a
-                  href="mailto:press@lumina.constellation"
+                  href="mailto:support@dealcanny.com"
                   className="text-amber-300 hover:underline sm:text-right"
                 >
-                  press@lumina.constellation
+                  support@dealcanny.com
                 </a>
               </li>
             </ul>
@@ -83,7 +83,7 @@ export default function Page() {
               pre-filled, addressed to our support team.
             </p>
             <form
-              action="mailto:support@lumina.constellation"
+              action="mailto:support@dealcanny.com"
               method="post"
               encType="text/plain"
               className="space-y-4"

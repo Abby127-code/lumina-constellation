@@ -176,10 +176,10 @@ export default function Page() {
             <p>
               Questions about this Disclaimer? Email{' '}
               <a
-                href="mailto:support@lumina.constellation"
+                href="mailto:support@dealcanny.com"
                 className="text-amber-300 hover:underline"
               >
-                support@lumina.constellation
+                support@dealcanny.com
               </a>
               .
             </p>

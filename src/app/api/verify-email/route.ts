@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
             const { Resend } = resendModule;
             const resend = new Resend(process.env.RESEND_API_KEY);
             await resend.emails.send({
-              from: process.env.MAIL_FROM || 'Lumina Studio <noreply@lumina.studio>',
+              from: process.env.MAIL_FROM || 'Lumina Constellation <support@dealcanny.com>',
               to: email,
               subject: '[Lumina Studio] 邮箱验证码',
               html: `

@@ -180,10 +180,10 @@ export default function Page() {
             <p>
               Questions about our use of cookies? Email{' '}
               <a
-                href="mailto:privacy@lumina.constellation"
+                href="mailto:support@dealcanny.com"
                 className="text-amber-300 hover:underline"
               >
-                privacy@lumina.constellation
+                support@dealcanny.com
               </a>
               .
             </p>

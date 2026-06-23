@@ -167,10 +167,10 @@ export default function Page() {
             <p className="mt-2">
               To exercise any of these rights, email{' '}
               <a
-                href="mailto:privacy@lumina.constellation"
+                href="mailto:support@dealcanny.com"
                 className="text-amber-300 hover:underline"
               >
-                privacy@lumina.constellation
+                support@dealcanny.com
               </a>
               . We respond to verified requests within 30 days.
             </p>
@@ -222,10 +222,10 @@ export default function Page() {
               Questions about this Privacy Policy or your personal data? Contact
               our Data Protection team at{' '}
               <a
-                href="mailto:privacy@lumina.constellation"
+                href="mailto:support@dealcanny.com"
                 className="text-amber-300 hover:underline"
               >
-                privacy@lumina.constellation
+                support@dealcanny.com
               </a>
               .
             </p>

@@ -107,10 +107,10 @@ export default function Page() {
               subscriptions. If you are not satisfied within seven (7) days of
               your initial purchase, contact{' '}
               <a
-                href="mailto:support@lumina.constellation"
+                href="mailto:support@dealcanny.com"
                 className="text-amber-300 hover:underline"
               >
-                support@lumina.constellation
+                support@dealcanny.com
               </a>{' '}
               with your order ID for a full refund. Refunds for renewals or
               after the 7-day window are evaluated case by case and are not
@@ -243,10 +243,10 @@ export default function Page() {
             <p>
               Questions about these Terms? Email{' '}
               <a
-                href="mailto:support@lumina.constellation"
+                href="mailto:support@dealcanny.com"
                 className="text-amber-300 hover:underline"
               >
-                support@lumina.constellation
+                support@dealcanny.com
               </a>
               .
             </p>
