@@ -36,7 +36,6 @@ export function LocaleProvider({ children, initialLocale = 'en' }: { children: R
   useEffect(() => {
     const saved = localStorage.getItem('lumina-locale') as Locale | null;
     if (saved && LOCALES.find((l) => l.code === saved)) {
-      // defer to next tick to avoid synchronous setState in effect
       const t = setTimeout(() => {
         setLocaleState(saved);
         document.documentElement.lang = saved;
@@ -44,6 +43,44 @@ export function LocaleProvider({ children, initialLocale = 'en' }: { children: R
       }, 0);
       return () => clearTimeout(t);
     }
+
+    // Auto-detect: Chinese browser → zh, others → en (already default)
+    const browserLang = navigator.language || navigator.languages?.[0] || 'en';
+    const langCode = browserLang.toLowerCase().split('-')[0];
+    if (langCode === 'zh') {
+      const t = setTimeout(() => {
+        setLocaleState('zh');
+        document.documentElement.lang = 'zh';
+        document.documentElement.dir = 'ltr';
+      }, 0);
+      return () => clearTimeout(t);
+    }
+    // Spanish
+    if (langCode === 'es') {
+      const t = setTimeout(() => { setLocaleState('es'); document.documentElement.lang = 'es'; }, 0);
+      return () => clearTimeout(t);
+    }
+    // Portuguese
+    if (langCode === 'pt') {
+      const t = setTimeout(() => { setLocaleState('pt'); document.documentElement.lang = 'pt'; }, 0);
+      return () => clearTimeout(t);
+    }
+    // Japanese
+    if (langCode === 'ja') {
+      const t = setTimeout(() => { setLocaleState('ja'); document.documentElement.lang = 'ja'; }, 0);
+      return () => clearTimeout(t);
+    }
+    // Hindi
+    if (langCode === 'hi') {
+      const t = setTimeout(() => { setLocaleState('hi'); document.documentElement.lang = 'hi'; }, 0);
+      return () => clearTimeout(t);
+    }
+    // Arabic
+    if (langCode === 'ar') {
+      const t = setTimeout(() => { setLocaleState('ar'); document.documentElement.lang = 'ar'; document.documentElement.dir = 'rtl'; }, 0);
+      return () => clearTimeout(t);
+    }
+    // Default: English
   }, []);
 
   const t = useCallback((key: string) => translate(key, locale), [locale]);
