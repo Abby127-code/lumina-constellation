@@ -451,6 +451,19 @@ ${cardsDescription}
     });
   } catch (err: any) {
     console.error('Mystic API error:', err);
+    // Fallback: return pre-generated content if AI API fails
+    const { getFallback } = await import('@/lib/ai-fallback');
+    const fallback = getFallback(module, input);
+    if (fallback) {
+      return NextResponse.json({
+        success: true,
+        module,
+        result: fallback,
+        metadata: {},
+        saved: null,
+        fallback: true,
+      });
+    }
     return NextResponse.json(
       { error: err?.message || 'Internal server error' },
       { status: 500 }
