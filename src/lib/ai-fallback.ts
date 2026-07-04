@@ -213,9 +213,9 @@ ${input.model || 'ChatGPT'} / Claude / Gemini
 - 字数要求：1500字
 
 ## 调优建议
-- 增加 `请给出3个标题选项` 可获得更多选择
-- 增加 `请用表格对比` 可获得结构化输出
-- 增加 `请用中文/英文` 可控制输出语言`,
+- 增加 请给出3个标题选项 可获得更多选择
+- 增加 请用表格对比 可获得结构化输出
+- 增加 请用中文/英文 可控制输出语言`,
 };
 
 export function getFallback(module: string, input: any): string | null {
