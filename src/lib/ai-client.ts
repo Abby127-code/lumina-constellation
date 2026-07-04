@@ -1,7 +1,7 @@
 /**
  * Lumina - Unified AI Client
  * Default: z-ai-web-dev-sdk (free, built-in)
- * Falls back to environment variable config on Vercel
+ * Supports Vercel deployment via Z_AI_CONFIG environment variable
  */
 import ZAI from 'z-ai-web-dev-sdk';
 import OpenAI from 'openai';
@@ -19,22 +19,25 @@ export interface AIConfig {
 
 let _zai: Awaited<ReturnType<typeof ZAI.create>> | null = null;
 let _openai: OpenAI | null = null;
+let _initialized = false;
 
-// Try to load z-ai config from file or environment
-function loadZaiConfig(): any | null {
-  // Try file paths
-  const paths = ['/etc/.z-ai-config', path.join(process.env.HOME || '', '.z-ai-config'), '.z-ai-config'];
-  for (const p of paths) {
-    try {
-      const content = fs.readFileSync(p, 'utf-8');
-      return JSON.parse(content);
-    } catch {}
-  }
-  // Try environment variable
+// Ensure z-ai config is available (write to file if env var is set)
+function ensureZaiConfig(): void {
+  if (_initialized) return;
+  _initialized = true;
+
+  // If Z_AI_CONFIG env var is set, write it to a file that SDK can find
   if (process.env.Z_AI_CONFIG) {
-    try { return JSON.parse(process.env.Z_AI_CONFIG); } catch {}
+    try {
+      // Try writing to /tmp (works on Vercel)
+      fs.writeFileSync('/tmp/.z-ai-config', process.env.Z_AI_CONFIG, 'utf-8');
+      // Also try home directory
+      const homeConfig = path.join(process.env.HOME || '/tmp', '.z-ai-config');
+      fs.writeFileSync(homeConfig, process.env.Z_AI_CONFIG, 'utf-8');
+    } catch (e) {
+      console.error('Failed to write z-ai config:', e);
+    }
   }
-  return null;
 }
 
 export function getAIConfig(): AIConfig {
@@ -57,6 +60,7 @@ async function getOpenAIClient(baseURL?: string): Promise<OpenAI> {
 
 async function getZai() {
   if (_zai) return _zai;
+  ensureZaiConfig();
   _zai = await ZAI.create();
   return _zai;
 }
@@ -123,11 +127,12 @@ export async function callAI(
 
 export function getAIInfo() {
   const config = getAIConfig();
-  const hasConfig = loadZaiConfig() !== null || process.env.Z_AI_CONFIG;
+  const hasEnvConfig = !!process.env.Z_AI_CONFIG;
+  const hasFileConfig = fs.existsSync('/etc/.z-ai-config') || fs.existsSync(path.join(process.env.HOME || '', '.z-ai-config')) || fs.existsSync('/tmp/.z-ai-config');
   return {
     provider: config.provider,
     model: config.model,
-    configured: config.provider !== 'zai' || hasConfig,
+    configured: config.provider !== 'zai' || hasEnvConfig || hasFileConfig,
     free: config.free,
     reasoningModel: process.env.DEEPSEEK_REASONING_MODEL || 'deepseek-reasoner',
   };
